@@ -4,6 +4,11 @@ import (
 	"github.com/healthy-tiger/gostree"
 )
 
+const (
+	true_symbol  = "true"
+	false_symbol = "false"
+)
+
 // Namespace シンボルと値のマップ
 type Namespace struct {
 	bindings map[gostree.SymbolID]interface{} // string, int64, float64, bool, Function, Extensionのいれずれか
@@ -127,5 +132,26 @@ func EvalList(lst *gostree.List, ns *Namespace, globals *Namespace) (interface{}
 	return fn.Call(args, globals)
 }
 
-// TODO globalsを初期化する関数を作る。（trueとかflaseとか、組み込みの定数）
-// TODO gostreeを評価する関数。globalsを初期化し、トップレベルのリストを順に評価する。
+// defaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
+func defaultNamespace(stree *gostree.STree) *Namespace {
+	ns := NewNamespace()
+	// 今の所、予約されているのはtrueとfalseだけ
+	trueid := stree.GetSymbolID(true_symbol)
+	falseid := stree.GetSymbolID(false_symbol)
+	ns.Set(trueid, true)
+	ns.Set(falseid, false)
+	return ns
+}
+
+// EvalSTree gostreeを評価する関数。globalsを初期化し、トップレベルのリストを順に評価する。
+func EvalSTree(stree *gostree.STree, resultHandler func(interface{}), errorHandler func(error)) {
+	globals := defaultNamespace(stree)
+	for _, t := range stree.Lists {
+		result, err := EvalList(t, globals, globals)
+		if err != nil {
+			errorHandler(err)
+		} else {
+			resultHandler(result)
+		}
+	}
+}
