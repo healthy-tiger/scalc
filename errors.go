@@ -9,4 +9,5 @@ var (
 	errorTheFirstElementOfTheListToBeEvaluatedMustBeASymbol         = errors.New("The first element of the list to be evaluated must be a symbol")
 	errorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject = errors.New("The first element of the list to be evaluated must be a callable object")
 	errorFunctionCannotBePassedAsFunctionArgument                   = errors.New("Function cannot be passed as function argument")
+	errorInsufficientNumberOfArguments                              = errors.New("Insufficient number of arguments")
 )

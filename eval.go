@@ -4,14 +4,9 @@ import (
 	"github.com/healthy-tiger/gostree"
 )
 
-const (
-	true_symbol  = "true"
-	false_symbol = "false"
-)
-
 // Namespace シンボルと値のマップ
 type Namespace struct {
-	bindings map[gostree.SymbolID]interface{} // string, int64, float64, bool, Function, Extensionのいれずれか
+	bindings map[gostree.SymbolID]interface{} // string, int64, float64, bool, *Function, Extensionのいれずれか
 }
 
 // Get nsからシンボルID idに対応する値を取得する。
@@ -70,13 +65,41 @@ func getSymbolValue(id gostree.SymbolID, ns *Namespace, globals *Namespace) inte
 	return nil
 }
 
+// EvalElement 構文要素を指定された名前空間で評価する。
+func EvalElement(st gostree.SyntaxElement, ns *Namespace, globals *Namespace) (interface{}, error) {
+	if st.IsList() {
+		return EvalList(st.(*gostree.List), ns, globals)
+	}
+	if sid, ok := st.SymbolValue(); ok {
+		sv := getSymbolValue(sid, ns, globals)
+		if sv == nil {
+			return nil, errorUndefinedSymbol
+		}
+		// 関数の引数に渡せるのは値のみ。シンボルや関数は渡せない。
+		switch sarg := sv.(type) {
+		case int64, float64, string, bool:
+			return sarg, nil
+		default:
+			return nil, errorFunctionCannotBePassedAsFunctionArgument
+		}
+	} else if ss, ok := st.StringValue(); ok {
+		return ss, nil
+	} else if si, ok := st.IntValue(); ok {
+		return si, nil
+	} else if sf, ok := st.FloatValue(); ok {
+		return sf, nil
+	} else {
+		panic("Illegal syntax tree element")
+	}
+}
+
 // EvalList リストlstを名前空間のもとで評価する。
 func EvalList(lst *gostree.List, ns *Namespace, globals *Namespace) (interface{}, error) {
 	// 空のリストは評価できないのでエラー(Excentionがリストを評価する場合はExtentionsによる）
 	if lst.Len() == 0 {
 		return nil, errorAnEmptyListIsNotAllowed
 	}
-	// 最初の要素は必ずシンボルで、呼び出し可能なオブジェクト（FunctionかExtensionにバインドされていなければならない）
+	// 最初の要素は必ずシンボルで、呼び出し可能なオブジェクト（*FunctionかExtensionにバインドされていなければならない）
 	callableid, ok := lst.SymbolAt(0)
 	if !ok {
 		return nil, errorTheFirstElementOfTheListToBeEvaluatedMustBeASymbol
@@ -89,7 +112,7 @@ func EvalList(lst *gostree.List, ns *Namespace, globals *Namespace) (interface{}
 	if ex, ok := callable.(Extension); ok {
 		return ex.Eval(lst, ns, globals)
 	}
-	fn, ok := callable.(Function)
+	fn, ok := callable.(*Function)
 	if !ok {
 		return nil, errorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject
 	}
@@ -97,37 +120,11 @@ func EvalList(lst *gostree.List, ns *Namespace, globals *Namespace) (interface{}
 	// callableがユーザー定義関数の場合は、2番目以降のリストの要素を評価し、その結果を引数にしてcallable(=fn)を呼び出して、その結果を返す。
 	args := make([]interface{}, lst.Len()-1)
 	for i := 1; i < lst.Len(); i++ {
-		t := lst.ElementAt(i)
-		if t.IsList() {
-			sl, err := EvalList(t.(*gostree.List), ns, globals)
-			if err != nil {
-				args[i-1] = sl
-			} else {
-				return nil, err
-			}
-		} else {
-			if sid, ok := t.SymbolValue(); ok {
-				sv := getSymbolValue(sid, ns, globals)
-				if sv == nil {
-					return nil, errorUndefinedSymbol
-				}
-				// 関数の引数に渡せるのは値のみ。シンボルや関数は渡せない。
-				switch sarg := sv.(type) {
-				case int64, float64, string, bool:
-					args[i-1] = sarg
-				default:
-					return nil, errorFunctionCannotBePassedAsFunctionArgument
-				}
-			} else if ss, ok := t.StringValue(); ok {
-				args[i-1] = ss
-			} else if si, ok := t.IntValue(); ok {
-				args[i-1] = si
-			} else if sf, ok := t.FloatValue(); ok {
-				args[i-1] = sf
-			} else {
-				panic("Illegal syntax tree element")
-			}
+		ev, err := EvalElement(lst.ElementAt(i), ns, globals)
+		if err != nil {
+			return nil, err
 		}
+		args[i-1] = ev
 	}
 	return fn.Call(args, globals)
 }
@@ -135,11 +132,7 @@ func EvalList(lst *gostree.List, ns *Namespace, globals *Namespace) (interface{}
 // defaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
 func defaultNamespace(stree *gostree.STree) *Namespace {
 	ns := NewNamespace()
-	// 今の所、予約されているのはtrueとfalseだけ
-	trueid := stree.GetSymbolID(true_symbol)
-	falseid := stree.GetSymbolID(false_symbol)
-	ns.Set(trueid, true)
-	ns.Set(falseid, false)
+	RegisterBoolTyoe(stree, ns)
 	return ns
 }
 
