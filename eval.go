@@ -25,28 +25,43 @@ func NewNamespace() *Namespace {
 	return &Namespace{make(map[gostree.SymbolID]interface{})}
 }
 
+// Callable 呼び出し可能なオブジェクトの呼び出し用
+type Callable interface {
+	Eval(lst *gostree.List, locals *Namespace, globals *Namespace) (interface{}, error)
+}
+
 // Function func関数で定義されたユーザー定義関数を表す。
 type Function struct {
 	params []gostree.SymbolID
 	body   *gostree.List
 }
 
-// Call 関数fを引数agrsと、グローバルの名前空間globalsで評価し、その結果を返す。
-func (f *Function) Call(params []interface{}, globals *Namespace) (interface{}, error) {
-	if len(f.params) != len(params) {
+// Eval 関数fを引数agrsと、グローバルの名前空間globalsで評価し、その結果を返す。
+func (f *Function) Eval(lst *gostree.List, locals *Namespace, globals *Namespace) (interface{}, error) {
+	if len(f.params) != lst.Len()-1 {
 		return nil, errorTheNumberOfArgumentsDoesNotMatch
 	}
 	lns := NewNamespace()
-	// 引数の値を名前空間にセット
-	for i := 0; i < len(params); i++ {
-		lns.Set(f.params[i], params[i])
+	// 引数を呼び出し元の名前空間で評価して、その結果を呼び出し先の名前空間にセット
+	for i := 1; i < lst.Len(); i++ {
+		a, err := EvalElement(lst.ElementAt(i), locals, globals)
+		if err != nil {
+			return nil, err
+		}
+		lns.Set(f.params[i-1], a)
 	}
 	return EvalList(f.body, lns, globals)
 }
 
-// Extension scalcの拡張関数のインターフェース
-type Extension interface {
-	Eval(lst *gostree.List, locals *Namespace, globals *Namespace) (interface{}, error) // lstは関数のシンボルを最初の要素に含んだ状態で渡される。
+// Extension scalcの拡張関数の構造体
+type Extension struct {
+	object interface{}
+	body   func(obj interface{}, lst *gostree.List, locals *Namespace, globals *Namespace) (interface{}, error) // lstは関数のシンボルを最初の要素に含んだ状態で渡される。
+}
+
+// Eval 拡張関数を呼び出す。
+func (ex *Extension) Eval(lst *gostree.List, locals *Namespace, globals *Namespace) (interface{}, error) {
+	return ex.body(ex.object, lst, locals, globals)
 }
 
 func getSymbolValue(id gostree.SymbolID, ns *Namespace, globals *Namespace) interface{} {
@@ -108,37 +123,22 @@ func EvalList(lst *gostree.List, ns *Namespace, globals *Namespace) (interface{}
 	if callable == nil {
 		return nil, errorUndefinedSymbol
 	}
-	// callableが拡張関数の場合は引数を事前に評価せずに渡す。
-	if ex, ok := callable.(Extension); ok {
-		return ex.Eval(lst, ns, globals)
+	if c, ok := callable.(Callable); ok {
+		return c.Eval(lst, ns, globals)
 	}
-	fn, ok := callable.(*Function)
-	if !ok {
-		return nil, errorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject
-	}
-
-	// callableがユーザー定義関数の場合は、2番目以降のリストの要素を評価し、その結果を引数にしてcallable(=fn)を呼び出して、その結果を返す。
-	args := make([]interface{}, lst.Len()-1)
-	for i := 1; i < lst.Len(); i++ {
-		ev, err := EvalElement(lst.ElementAt(i), ns, globals)
-		if err != nil {
-			return nil, err
-		}
-		args[i-1] = ev
-	}
-	return fn.Call(args, globals)
+	return nil, errorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject
 }
 
-// defaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
-func defaultNamespace(stree *gostree.STree) *Namespace {
+// DefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
+func DefaultNamespace(stree *gostree.STree) *Namespace {
 	ns := NewNamespace()
-	RegisterBoolTyoe(stree, ns)
+	RegisterBoolType(stree, ns)
+	RegisterOperators(stree, ns)
 	return ns
 }
 
-// EvalSTree gostreeを評価する関数。globalsを初期化し、トップレベルのリストを順に評価する。
-func EvalSTree(stree *gostree.STree, resultHandler func(interface{}), errorHandler func(error)) {
-	globals := defaultNamespace(stree)
+// EvalSTree gostreeを評価する関数。与えられたデフォルトの名前空間のもとで、トップレベルのリストを順に評価する。
+func EvalSTree(stree *gostree.STree, globals *Namespace, resultHandler func(interface{}), errorHandler func(error)) {
 	for _, t := range stree.Lists {
 		result, err := EvalList(t, globals, globals)
 		if err != nil {
