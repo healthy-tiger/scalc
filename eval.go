@@ -129,6 +129,12 @@ func EvalList(lst *gostree.List, ns *Namespace, globals *Namespace) (interface{}
 	return nil, errorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject
 }
 
+// RegisterExtension 拡張関数を登録する。
+func RegisterExtension(stree *gostree.STree, ns *Namespace, symbolName string, extobj interface{}, extbody func(interface{}, *gostree.List, *Namespace, *Namespace) (interface{}, error)) {
+	sid := stree.GetSymbolID(symbolName)
+	ns.Set(sid, &Extension{extobj, extbody})
+}
+
 // DefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
 func DefaultNamespace(stree *gostree.STree) *Namespace {
 	ns := NewNamespace()

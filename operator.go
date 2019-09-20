@@ -56,10 +56,7 @@ func addBody(_ interface{}, lst *gostree.List, locals *Namespace, globals *Names
 	return result, nil
 }
 
-var addOperator = Extension{nil, addBody}
-
 // RegisterOperators streeに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterOperators(stree *gostree.STree, ns *Namespace) {
-	addid := stree.GetSymbolID(addSymbol)
-	ns.Set(addid, &addOperator)
+	RegisterExtension(stree, ns, addSymbol, nil, addBody)
 }
