@@ -20,6 +20,7 @@ var addtests []optest = []optest{
 	{`(+ 1 2 (+ 10.0 20) 3)`, int64(36)},
 	{`(+ 1 2 (+ -10.0 -20.0) 3)`, int64(-24)},
 	{`(+ 1.0 2 3)`, float64(6.0)},
+	{`(+ 1 2.0 3.0)`, int64(6)},
 }
 
 func TestAdd(t *testing.T) {
