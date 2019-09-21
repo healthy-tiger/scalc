@@ -29,8 +29,8 @@ func TestAdd(t *testing.T) {
 		if err != nil {
 			t.Errorf("Parse error: %v\n", err)
 		} else {
-			globals := DefaultNamespace(st)
-			result, err := EvalList(st.Lists[0], globals, globals)
+			ns := DefaultNamespace(st)
+			result, err := EvalList(st.Lists[0], ns)
 			if err != nil {
 				t.Fatalf("Eval error: %v\n", err)
 			}
