@@ -15,11 +15,15 @@ type Namespace struct {
 
 // Get nsからシンボルID idに対応する値を取得する。
 func (ns *Namespace) Get(id gostree.SymbolID) (interface{}, bool) {
-	v, ok := ns.bindings[id]
-	if ok {
-		return v, ok
+	n := ns
+	for n != nil {
+		v, ok := n.bindings[id]
+		if ok {
+			return v, true
+		}
+		n = n.parent
 	}
-	return ns.parent.Get(id)
+	return nil, false
 }
 
 // Set nsにシンボルID idに対応する値を格納する。
