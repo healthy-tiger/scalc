@@ -10,4 +10,5 @@ var (
 	errorFunctionCannotBePassedAsFunctionArgument                   = errors.New("Function cannot be passed as function argument")
 	errorInsufficientNumberOfArguments                              = errors.New("Insufficient number of arguments")
 	errorTooManyArguments                                           = errors.New("Too many arguments")
+	errorIntegerDivideByZero                                        = errors.New("integer divide by zero")
 )

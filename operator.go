@@ -43,7 +43,7 @@ func addBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 			if iv, ok := params[i].(int64); ok {
 				result = v + iv
 			} else if fv, ok := params[i].(float64); ok {
-				result = v + int64(fv)
+				result = float64(v) + fv
 			} else {
 				return nil, errorOperantMustHaveArithmeticDataType
 			}
@@ -101,7 +101,7 @@ func subBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 			if iv, ok := params[i].(int64); ok {
 				result = v - iv
 			} else if fv, ok := params[i].(float64); ok {
-				result = v - int64(fv)
+				result = float64(v) - fv
 			} else {
 				return nil, errorOperantMustHaveArithmeticDataType
 			}
@@ -143,7 +143,7 @@ func mulBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 			if iv, ok := params[i].(int64); ok {
 				result = v * iv
 			} else if fv, ok := params[i].(float64); ok {
-				result = v * int64(fv)
+				result = float64(v) * fv
 			} else {
 				return nil, errorOperantMustHaveArithmeticDataType
 			}
@@ -183,9 +183,12 @@ func divBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 		switch v := result.(type) {
 		case int64:
 			if iv, ok := params[i].(int64); ok {
+				if iv == 0 { // ゼロ割のチェック
+					return nil, errorIntegerDivideByZero
+				}
 				result = v / iv
 			} else if fv, ok := params[i].(float64); ok {
-				result = v / int64(fv)
+				result = float64(v) / fv
 			} else {
 				return nil, errorOperantMustHaveArithmeticDataType
 			}
