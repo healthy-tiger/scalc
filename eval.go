@@ -106,10 +106,10 @@ func EvalElement(st gostree.SyntaxElement, ns *Namespace) (interface{}, error) {
 		}
 		// 関数の引数に渡せるのは値のみ。シンボルや関数は渡せない。
 		switch sarg := sv.(type) {
-		case int64, float64, string, bool:
+		case int64, float64, string, bool, Callable:
 			return sarg, nil
 		default:
-			return nil, errorFunctionCannotBePassedAsFunctionArgument
+			panic("Unexpected evaluation result type")
 		}
 	} else if ss, ok := st.StringValue(); ok {
 		return ss, nil
@@ -129,13 +129,9 @@ func EvalList(lst *gostree.List, ns *Namespace) (interface{}, error) {
 		return nil, errorAnEmptyListIsNotAllowed
 	}
 	// 最初の要素は必ずシンボルで、呼び出し可能なオブジェクト（*FunctionかExtensionにバインドされていなければならない）
-	callableid, ok := lst.SymbolAt(0)
-	if !ok {
-		return nil, errorTheFirstElementOfTheListToBeEvaluatedMustBeASymbol
-	}
-	callable, ok := ns.Get(callableid) // 名前空間から値を取得
-	if !ok {
-		return nil, errorUndefinedSymbol
+	callable, err := EvalElement(lst.ElementAt(0), ns)
+	if err != nil {
+		return nil, err
 	}
 	if c, ok := callable.(Callable); ok {
 		return c.Eval(lst, ns)
