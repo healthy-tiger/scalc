@@ -67,6 +67,16 @@ var divtests []optest = []optest{
 	{`(/ 1 0.0)`, false, false, math.Inf(1)},
 }
 
+var remtests []optest = []optest{
+	{`(% 1 2)`, false, false, int64(1)},
+	{`(% 1 0)`, false, true, nil},
+	{`(% 1 2 3)`, false, true, nil},
+	{`(% 1.0 2)`, false, true, nil},
+	{`(% 1 2.0)`, false, true, nil},
+	{`(% "1" 2)`, false, true, nil},
+	{`(% 1 "2")`, false, true, nil},
+}
+
 func doOpTests(name string, t *testing.T, tests []optest) {
 	for i, tst := range tests {
 		st, err := gostree.ParseString(fmt.Sprintf("%v%d", name, i), tst.src)
@@ -118,4 +128,8 @@ func TestMul(t *testing.T) {
 
 func TestDiv(t *testing.T) {
 	doOpTests("TestDiv", t, divtests)
+}
+
+func TestRem(t *testing.T) {
+	doOpTests("TestRem", t, remtests)
 }

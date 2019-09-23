@@ -226,6 +226,9 @@ func remBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 	}
 	if a, ok := pa.(int64); ok {
 		if b, ok := pb.(int64); ok {
+			if b == 0 {
+				return nil, errorIntegerDivideByZero
+			}
 			return a % b, nil
 		}
 	}
