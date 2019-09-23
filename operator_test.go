@@ -1,4 +1,4 @@
-package scalc
+package scalc_test
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/healthy-tiger/gostree"
+	"github.com/healthy-tiger/scalc"
 )
 
 type optest struct {
@@ -85,8 +86,8 @@ func doOpTests(name string, t *testing.T, tests []optest) {
 				t.Errorf("[%d]Parse error: %v\n", i, err)
 			}
 		} else {
-			ns := DefaultNamespace(st)
-			result, err := EvalList(st.Lists[0], ns)
+			ns := scalc.DefaultNamespace(st)
+			result, err := scalc.EvalList(st.Lists[0], ns)
 			if err != nil {
 				if !tst.evalError {
 					t.Errorf("[%d]Eval error: %v\n", i, err)
