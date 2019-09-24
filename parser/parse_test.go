@@ -214,8 +214,8 @@ func TestParse13(t *testing.T) {
 	}
 	pe, ok := err.(*ParseError)
 	if !ok {
-		if pe.MessageID != ErrorMissingClosingParenthesis {
-			t.Errorf("Unexpected message id: %d", pe.MessageID)
+		if pe.ID != ErrorMissingClosingParenthesis {
+			t.Errorf("Unexpected message id: %d", pe.ID)
 		}
 	}
 }

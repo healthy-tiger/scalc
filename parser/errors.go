@@ -46,24 +46,22 @@ func init() {
 
 // ParseError パース時のエラーメッセージを格納する
 type ParseError struct {
-	Filename  string
-	Line      int
-	Column    int
-	MessageID int
+	ErrorLocation Position
+	ID            int
 }
 
 func (err *ParseError) Error() string {
 	var b bytes.Buffer
-	b.WriteString(err.Filename)
+	b.WriteString(err.ErrorLocation.Filename)
 	b.WriteString("[")
-	b.WriteString(strconv.FormatInt(int64(err.Line), 10))
+	b.WriteString(strconv.FormatInt(int64(err.ErrorLocation.Line), 10))
 	b.WriteString(",")
-	b.WriteString(strconv.FormatInt(int64(err.Column), 10))
+	b.WriteString(strconv.FormatInt(int64(err.ErrorLocation.Column), 10))
 	b.WriteString("] ")
-	b.WriteString(errorMessages[err.MessageID])
+	b.WriteString(errorMessages[err.ID])
 	return b.String()
 }
 
 func newError(filename string, line int, column int, messageid int) *ParseError {
-	return &ParseError{filename, line, column, messageid}
+	return &ParseError{Position{filename, line, column}, messageid}
 }
