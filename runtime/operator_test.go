@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/healthy-tiger/gostree"
-	"github.com/healthy-tiger/scalc"
+	"github.com/healthy-tiger/scalc/runtime"
 )
 
 type optest struct {
@@ -87,8 +87,8 @@ func doOpTests(name string, t *testing.T, tests []optest) {
 				t.Errorf("[%d]Parse error: %v\n", i, err)
 			}
 		} else {
-			ns := scalc.DefaultNamespace(st)
-			result, err := scalc.EvalList(lists[0], ns)
+			ns := runtime.DefaultNamespace(st)
+			result, err := runtime.EvalList(lists[0], ns)
 			if err != nil {
 				if !tst.evalError {
 					t.Errorf("[%d]Eval error: %v\n", i, err)
