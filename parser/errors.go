@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-// 実行時エラーの定義
+// 内部エラーの定義
 var (
 	ErrorArgumentIsNil            = errors.New("Argument is nil")
 	ErrorValueTypeIsNotAsExpected = errors.New("Value type is not as expected")

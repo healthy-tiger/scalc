@@ -1,8 +1,2 @@
-github.com/healthy-tiger/gostree v0.0.0-20190916000313-a29c605e5ab8 h1:jKSJMopwSorahM8YekDLikNMPvhwTpGCLzAdwwYU7VI=
-github.com/healthy-tiger/gostree v0.0.0-20190916000313-a29c605e5ab8/go.mod h1:934YTofbb44WahU7vUE3XbwN0sraQkCsijqFpk5ydO4=
-github.com/healthy-tiger/gostree v0.0.0-20190924121136-0eec818f6734 h1:nAyPTA4WYDVutVPaNogSHy5dwhsQw735CFVEFOfscE8=
-github.com/healthy-tiger/gostree v0.0.0-20190924121136-0eec818f6734/go.mod h1:934YTofbb44WahU7vUE3XbwN0sraQkCsijqFpk5ydO4=
-github.com/healthy-tiger/scalc v0.0.0-20190924135137-115e0e81a089 h1:o8heYyhR0jYRZIPAY+xeSfai903my+DkiX/aedp1vtQ=
-github.com/healthy-tiger/scalc v0.0.0-20190924135137-115e0e81a089/go.mod h1:2eSYOkh+iPJM/yuwokDyB0afA6H3+sFqiz6rfTXenQ0=
-github.com/healthy-tiger/scalc/parser v0.0.0-20190924142503-7d97c6103df2 h1:xpUjW4iw+RYfPw1P86KbInTjd5CyuCXDZYfJu8OA+mU=
-github.com/healthy-tiger/scalc/parser v0.0.0-20190924142503-7d97c6103df2/go.mod h1:mleB1p6odYSR/UxgtV6KmZvbKdY1fbGXf3mug27TukE=
+github.com/healthy-tiger/scalc/parser v0.0.0-20190924145222-085d33f01512 h1:lbMZrVoccuSIOFOkfNB9cyr5yy87ePwlkX3Z0fPL2NU=
+github.com/healthy-tiger/scalc/parser v0.0.0-20190924145222-085d33f01512/go.mod h1:ebRsZ4hbuCZw0QC9BHij73kHorGy7nSoglB7fyRVIgA=
