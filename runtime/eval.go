@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/healthy-tiger/gostree"
+	"github.com/healthy-tiger/scalc/parser"
 )
 
 // TODO エラーは行と列を返せるようにする。
@@ -10,11 +10,11 @@ import (
 type Namespace struct {
 	root     *Namespace
 	parent   *Namespace
-	bindings map[gostree.SymbolID]interface{} // string, int64, float64, bool, *Function, Extensionのいれずれか
+	bindings map[parser.SymbolID]interface{} // string, int64, float64, bool, *Function, Extensionのいれずれか
 }
 
 // Get nsからシンボルID idに対応する値を取得する。
-func (ns *Namespace) Get(id gostree.SymbolID) (interface{}, bool) {
+func (ns *Namespace) Get(id parser.SymbolID) (interface{}, bool) {
 	n := ns
 	for n != nil {
 		v, ok := n.bindings[id]
@@ -27,7 +27,7 @@ func (ns *Namespace) Get(id gostree.SymbolID) (interface{}, bool) {
 }
 
 // Set nsにシンボルID idに対応する値を格納する。
-func (ns *Namespace) Set(id gostree.SymbolID, value interface{}) {
+func (ns *Namespace) Set(id parser.SymbolID, value interface{}) {
 	ns.bindings[id] = value
 }
 
@@ -51,22 +51,22 @@ func NewNamespace(parent *Namespace) *Namespace {
 			p = p.parent
 		}
 	}
-	return &Namespace{p, parent, make(map[gostree.SymbolID]interface{})}
+	return &Namespace{p, parent, make(map[parser.SymbolID]interface{})}
 }
 
 // Callable 呼び出し可能なオブジェクトの呼び出し用
 type Callable interface {
-	Eval(lst *gostree.List, ns *Namespace) (interface{}, error)
+	Eval(lst *parser.List, ns *Namespace) (interface{}, error)
 }
 
 // Function func関数で定義されたユーザー定義関数を表す。
 type Function struct {
-	params []gostree.SymbolID
-	body   *gostree.List
+	params []parser.SymbolID
+	body   *parser.List
 }
 
 // Eval 関数fを引数agrsと、グローバルの名前空間globalsで評価し、その結果を返す。
-func (f *Function) Eval(lst *gostree.List, ns *Namespace) (interface{}, error) {
+func (f *Function) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 	if len(f.params) != lst.Len()-1 {
 		return nil, errorTheNumberOfArgumentsDoesNotMatch
 	}
@@ -86,18 +86,18 @@ func (f *Function) Eval(lst *gostree.List, ns *Namespace) (interface{}, error) {
 // Extension scalcの拡張関数の構造体
 type Extension struct {
 	object interface{}
-	body   func(obj interface{}, lst *gostree.List, ns *Namespace) (interface{}, error) // lstは関数のシンボルを最初の要素に含んだ状態で渡される。
+	body   func(obj interface{}, lst *parser.List, ns *Namespace) (interface{}, error) // lstは関数のシンボルを最初の要素に含んだ状態で渡される。
 }
 
 // Eval 拡張関数を呼び出す。
-func (ex *Extension) Eval(lst *gostree.List, ns *Namespace) (interface{}, error) {
+func (ex *Extension) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 	return ex.body(ex.object, lst, ns)
 }
 
 // EvalElement 構文要素を指定された名前空間で評価する。
-func EvalElement(st gostree.SyntaxElement, ns *Namespace) (interface{}, error) {
+func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 	if st.IsList() {
-		return EvalList(st.(*gostree.List), ns)
+		return EvalList(st.(*parser.List), ns)
 	}
 	if sid, ok := st.SymbolValue(); ok {
 		sv, ok := ns.Get(sid)
@@ -123,7 +123,7 @@ func EvalElement(st gostree.SyntaxElement, ns *Namespace) (interface{}, error) {
 }
 
 // EvalList リストlstを名前空間のもとで評価する。
-func EvalList(lst *gostree.List, ns *Namespace) (interface{}, error) {
+func EvalList(lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 空のリストは評価できないのでエラー(Excentionがリストを評価する場合はExtentionsによる）
 	if lst.Len() == 0 {
 		return nil, errorAnEmptyListIsNotAllowed
@@ -140,13 +140,13 @@ func EvalList(lst *gostree.List, ns *Namespace) (interface{}, error) {
 }
 
 // RegisterExtension 拡張関数を登録する。
-func RegisterExtension(st *gostree.SymbolTable, ns *Namespace, symbolName string, extobj interface{}, extbody func(interface{}, *gostree.List, *Namespace) (interface{}, error)) {
+func RegisterExtension(st *parser.SymbolTable, ns *Namespace, symbolName string, extobj interface{}, extbody func(interface{}, *parser.List, *Namespace) (interface{}, error)) {
 	sid := st.GetSymbolID(symbolName)
 	ns.Set(sid, &Extension{extobj, extbody})
 }
 
 // DefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
-func DefaultNamespace(st *gostree.SymbolTable) *Namespace {
+func DefaultNamespace(st *parser.SymbolTable) *Namespace {
 	ns := NewNamespace(nil)
 	RegisterBoolType(st, ns)
 	RegisterOperators(st, ns)

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/healthy-tiger/gostree"
+	"github.com/healthy-tiger/scalc/parser"
 )
 
 const (
@@ -21,7 +21,7 @@ var (
 )
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらのすべてを加算した結果を返す。stringの場合にはオペラントすべてを既定の形式で文字列に変換したものをすべて連結した文字列を返す。
-func addBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, error) {
+func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
 		return nil, errorInsufficientNumberOfArguments
 	}
@@ -79,7 +79,7 @@ func addBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 }
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを減算した結果を返す。
-func subBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, error) {
+func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
 		return nil, errorInsufficientNumberOfArguments
 	}
@@ -121,7 +121,7 @@ func subBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 }
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを乗算した結果を返す。
-func mulBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, error) {
+func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
 		return nil, errorInsufficientNumberOfArguments
 	}
@@ -163,7 +163,7 @@ func mulBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 }
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを除算した結果を返す。
-func divBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, error) {
+func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
 		return nil, errorInsufficientNumberOfArguments
 	}
@@ -208,7 +208,7 @@ func divBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 }
 
 // Eval 2つのオペラントの評価結果がすべてint64の場合に最初の引数を次の引数で割った余りを返す。
-func remBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, error) {
+func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 要するにオペラントは2つしか許容しない
 	if lst.Len() < 3 {
 		return nil, errorInsufficientNumberOfArguments
@@ -236,7 +236,7 @@ func remBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 }
 
 // RegisterOperators streeに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
-func RegisterOperators(st *gostree.SymbolTable, ns *Namespace) {
+func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, addSymbol, nil, addBody)
 	RegisterExtension(st, ns, subSymbol, nil, subBody)
 	RegisterExtension(st, ns, mulSymbol, nil, mulBody)

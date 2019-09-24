@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/healthy-tiger/gostree"
+	"github.com/healthy-tiger/scalc/parser"
 )
 
 const (
@@ -10,7 +10,7 @@ const (
 )
 
 // RegisterBoolType streeにbool型のシンボルを、nsにシンボルに対応する値を登録する。
-func RegisterBoolType(st *gostree.SymbolTable, ns *Namespace) {
+func RegisterBoolType(st *parser.SymbolTable, ns *Namespace) {
 	// 今の所、予約されているのはtrueとfalseだけ
 	trueid := st.GetSymbolID(trueSymbol)
 	falseid := st.GetSymbolID(falseSymbol)

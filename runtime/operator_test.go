@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/healthy-tiger/gostree"
+	"github.com/healthy-tiger/scalc/parser"
 	"github.com/healthy-tiger/scalc/runtime"
 )
 
@@ -80,8 +80,8 @@ var remtests []optest = []optest{
 
 func doOpTests(name string, t *testing.T, tests []optest) {
 	for i, tst := range tests {
-		st := gostree.NewSymbolTable()
-		lists, err := gostree.ParseString(fmt.Sprintf("%v%d", name, i), st, tst.src)
+		st := parser.NewSymbolTable()
+		lists, err := parser.ParseString(fmt.Sprintf("%v%d", name, i), st, tst.src)
 		if err != nil {
 			if !tst.parseError {
 				t.Errorf("[%d]Parse error: %v\n", i, err)
