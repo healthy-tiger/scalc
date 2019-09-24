@@ -140,27 +140,15 @@ func EvalList(lst *gostree.List, ns *Namespace) (interface{}, error) {
 }
 
 // RegisterExtension 拡張関数を登録する。
-func RegisterExtension(stree *gostree.STree, ns *Namespace, symbolName string, extobj interface{}, extbody func(interface{}, *gostree.List, *Namespace) (interface{}, error)) {
-	sid := stree.GetSymbolID(symbolName)
+func RegisterExtension(st *gostree.SymbolTable, ns *Namespace, symbolName string, extobj interface{}, extbody func(interface{}, *gostree.List, *Namespace) (interface{}, error)) {
+	sid := st.GetSymbolID(symbolName)
 	ns.Set(sid, &Extension{extobj, extbody})
 }
 
 // DefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
-func DefaultNamespace(stree *gostree.STree) *Namespace {
+func DefaultNamespace(st *gostree.SymbolTable) *Namespace {
 	ns := NewNamespace(nil)
-	RegisterBoolType(stree, ns)
-	RegisterOperators(stree, ns)
+	RegisterBoolType(st, ns)
+	RegisterOperators(st, ns)
 	return ns
-}
-
-// EvalSTree gostreeを評価する関数。与えられたデフォルトの名前空間のもとで、トップレベルのリストを順に評価する。
-func EvalSTree(stree *gostree.STree, ns *Namespace, resultHandler func(interface{}), errorHandler func(error)) {
-	for _, t := range stree.Lists {
-		result, err := EvalList(t, ns)
-		if err != nil {
-			errorHandler(err)
-		} else {
-			resultHandler(result)
-		}
-	}
 }

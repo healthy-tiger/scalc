@@ -80,14 +80,15 @@ var remtests []optest = []optest{
 
 func doOpTests(name string, t *testing.T, tests []optest) {
 	for i, tst := range tests {
-		st, err := gostree.ParseString(fmt.Sprintf("%v%d", name, i), tst.src)
+		st := gostree.NewSymbolTable()
+		lists, err := gostree.ParseString(fmt.Sprintf("%v%d", name, i), st, tst.src)
 		if err != nil {
 			if !tst.parseError {
 				t.Errorf("[%d]Parse error: %v\n", i, err)
 			}
 		} else {
 			ns := scalc.DefaultNamespace(st)
-			result, err := scalc.EvalList(st.Lists[0], ns)
+			result, err := scalc.EvalList(lists[0], ns)
 			if err != nil {
 				if !tst.evalError {
 					t.Errorf("[%d]Eval error: %v\n", i, err)

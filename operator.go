@@ -236,10 +236,10 @@ func remBody(_ interface{}, lst *gostree.List, ns *Namespace) (interface{}, erro
 }
 
 // RegisterOperators streeに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
-func RegisterOperators(stree *gostree.STree, ns *Namespace) {
-	RegisterExtension(stree, ns, addSymbol, nil, addBody)
-	RegisterExtension(stree, ns, subSymbol, nil, subBody)
-	RegisterExtension(stree, ns, mulSymbol, nil, mulBody)
-	RegisterExtension(stree, ns, divSymbol, nil, divBody)
-	RegisterExtension(stree, ns, remSymbol, nil, remBody)
+func RegisterOperators(st *gostree.SymbolTable, ns *Namespace) {
+	RegisterExtension(st, ns, addSymbol, nil, addBody)
+	RegisterExtension(st, ns, subSymbol, nil, subBody)
+	RegisterExtension(st, ns, mulSymbol, nil, mulBody)
+	RegisterExtension(st, ns, divSymbol, nil, divBody)
+	RegisterExtension(st, ns, remSymbol, nil, remBody)
 }
