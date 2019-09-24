@@ -1,4 +1,4 @@
-package scalc_test
+package runtime_test
 
 import (
 	"fmt"

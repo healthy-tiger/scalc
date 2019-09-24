@@ -1,4 +1,4 @@
-package scalc
+package runtime
 
 import (
 	"github.com/healthy-tiger/gostree"
