@@ -141,9 +141,10 @@ func EvalList(lst *parser.List, ns *Namespace) (interface{}, error) {
 }
 
 // RegisterExtension 拡張関数を登録する。
-func RegisterExtension(st *parser.SymbolTable, ns *Namespace, symbolName string, extobj interface{}, extbody func(interface{}, *parser.List, *Namespace) (interface{}, error)) {
+func RegisterExtension(st *parser.SymbolTable, ns *Namespace, symbolName string, extobj interface{}, extbody func(interface{}, *parser.List, *Namespace) (interface{}, error)) parser.SymbolID {
 	sid := st.GetSymbolID(symbolName)
 	ns.Set(sid, &Extension{extobj, extbody})
+	return sid
 }
 
 // DefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
