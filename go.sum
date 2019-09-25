@@ -1,0 +1,5 @@
+github.com/healthy-tiger/scalc/parser v0.0.0-20190924145222-085d33f01512/go.mod h1:ebRsZ4hbuCZw0QC9BHij73kHorGy7nSoglB7fyRVIgA=
+github.com/healthy-tiger/scalc/parser v0.0.0-20190924154012-e06b6f165f0c h1:Fj89qU0V8GSSDBSCwacV+f5X7oS/Q4w66cFDlnwy8U8=
+github.com/healthy-tiger/scalc/parser v0.0.0-20190924154012-e06b6f165f0c/go.mod h1:ebRsZ4hbuCZw0QC9BHij73kHorGy7nSoglB7fyRVIgA=
+github.com/healthy-tiger/scalc/runtime v0.0.0-20190924154012-e06b6f165f0c h1:10G+c1cVd+aP/kXZ7RoGdbrKTP3zs4OZKChXdu87Rx8=
+github.com/healthy-tiger/scalc/runtime v0.0.0-20190924154012-e06b6f165f0c/go.mod h1:gSAHjJr0FuzWA0x78zy6sXTwuiLJvD6e0n4avU3ExIA=
