@@ -12,6 +12,12 @@ const (
 	mulSymbol = "*"
 	divSymbol = "/"
 	remSymbol = "%"
+	eqSymbol  = "eq" // すべての引数の型と値が一致した場合にtrueになる
+	ltSymbol  = "<"
+	lteSymbol = "<="
+	gtSymbol  = ">"
+	gteSymbol = ">="
+	notSymbol = "not"
 )
 
 // 演算子に関するエラーコード
@@ -19,6 +25,7 @@ const (
 	ErrorOperantMustHaveArithmeticDataType                     = iota
 	ErrorTheRemainderCannotBeCalculatedUnlessItIsAnIntegerType = iota
 	ErrorIntegerDivideByZero                                   = iota
+	ErrorAllOperantsMustBeOfTheSameType                        = iota
 )
 
 var operatorExtName = "operators"
@@ -29,6 +36,7 @@ func init() {
 		ErrorOperantMustHaveArithmeticDataType:                     "Operant must have arithmetic data type",
 		ErrorTheRemainderCannotBeCalculatedUnlessItIsAnIntegerType: "The remainder cannot be calculated unless it is an integer type",
 		ErrorIntegerDivideByZero:                                   "integer divide by zero",
+		ErrorAllOperantsMustBeOfTheSameType:                        "All operants must be of the same type",
 	}
 }
 
@@ -255,6 +263,25 @@ func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	return nil, newOpError(lst.ElementAt(1).Position(), ErrorTheRemainderCannotBeCalculatedUnlessItIsAnIntegerType)
 }
 
+func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+	l, err := EvalElement(lst.ElementAt(1), ns)
+	if err != nil {
+		return nil, err
+	}
+	for i := 2; i < lst.Len(); i++ {
+		r, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		} else if l != r {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
 // RegisterOperators streeに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, addSymbol, nil, addBody)
@@ -262,4 +289,5 @@ func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, mulSymbol, nil, mulBody)
 	RegisterExtension(st, ns, divSymbol, nil, divBody)
 	RegisterExtension(st, ns, remSymbol, nil, remBody)
+	RegisterExtension(st, ns, eqSymbol, nil, eqBody)
 }

@@ -31,6 +31,10 @@ var addtests []optest = []optest{
 	{`(+ "abc" 1.0)`, false, false, "abc" + strconv.FormatFloat(1.0, 'e', -1, 64)},
 	//{`(+ 1 + "abc")`, false, false, nil}, // 算術データ型が必要な胸のエラーがでるはず
 	{`(+ "" 123)`, false, false, "123"},
+	{`(+ true 1)`, false, true, nil},
+	{`(+ 1 false)`, false, true, nil},
+	{`(+ true false)`, false, true, nil},
+	{`(+ true "true")`, false, true, nil},
 }
 
 var subtests []optest = []optest{
@@ -42,6 +46,10 @@ var subtests []optest = []optest{
 	{`(- 1 2 (- -10.0 -20.0) 3)`, false, false, float64(int64(1)-int64(2)) - (float64(-10.0) - float64(-20.0)) - float64(int64(3))},
 	{`(- 1.0 2 3)`, false, false, (float64(1.0) - float64(int64(2))) - float64(int64(3))},
 	{`(- 1 2.1 3.0)`, false, false, float64(int64(1)) - float64(2.1) - float64(3.0)},
+	{`(- true 1)`, false, true, nil},
+	{`(- 1 false)`, false, true, nil},
+	{`(- true false)`, false, true, nil},
+	{`(- true "true")`, false, true, nil},
 }
 
 var multests []optest = []optest{
@@ -53,6 +61,10 @@ var multests []optest = []optest{
 	{`(* 1 2 (* -10.0 -20.0) 3)`, false, false, float64(int64(1)*int64(2)) * (float64(-10.0) * float64(-20.0)) * float64(int64(3))},
 	{`(* 1.0 2 3)`, false, false, (float64(1.0) * float64(int64(2))) * float64(int64(3))},
 	{`(* 1 2.1 3.0)`, false, false, float64(int64(1)) * float64(2.1) * float64(3.0)},
+	{`(* true 1)`, false, true, nil},
+	{`(* 1 false)`, false, true, nil},
+	{`(* true false)`, false, true, nil},
+	{`(* true "true")`, false, true, nil},
 }
 
 var divtests []optest = []optest{
@@ -66,6 +78,10 @@ var divtests []optest = []optest{
 	{`(/ 1.0 2 3)`, false, false, (float64(1.0) / float64(int64(2))) / float64(int64(3))},
 	{`(/ 1 2.1 3.0)`, false, false, float64(int64(1)) / float64(2.1) / float64(3.0)},
 	{`(/ 1 0.0)`, false, false, math.Inf(1)},
+	{`(/ true 1)`, false, true, nil},
+	{`(/ 1 false)`, false, true, nil},
+	{`(/ true false)`, false, true, nil},
+	{`(/ true "true")`, false, true, nil},
 }
 
 var remtests []optest = []optest{
@@ -76,6 +92,22 @@ var remtests []optest = []optest{
 	{`(% 1 2.0)`, false, true, nil},
 	{`(% "1" 2)`, false, true, nil},
 	{`(% 1 "2")`, false, true, nil},
+	{`(% true 1)`, false, true, nil},
+	{`(% 1 false)`, false, true, nil},
+	{`(% true false)`, false, true, nil},
+	{`(% true "true")`, false, true, nil},
+}
+
+var eqtests []optest = []optest{
+	{`(eq 1 1)`, false, false, true},
+	{`(eq 2 1)`, false, false, false},
+	{`(eq 1.0 1.0)`, false, false, true},
+	{`(eq 2.0 1.0)`, false, false, false},
+	{`(eq "abc" "abc")`, false, false, true},
+	{`(eq "abc" "123")`, false, false, false},
+	{`(eq 1 1.0)`, false, false, false},
+	{`(eq 1 "1")`, false, false, false},
+	{`(eq 1 true)`, false, false, false},
 }
 
 func doOpTests(name string, t *testing.T, tests []optest) {
@@ -107,6 +139,10 @@ func doOpTests(name string, t *testing.T, tests []optest) {
 					if se, ok := tst.expected.(string); ok && sr == se {
 						success = true
 					}
+				} else if br, ok := result.(bool); ok {
+					if be, ok := tst.expected.(bool); ok && br == be {
+						success = true
+					}
 				}
 				if !success {
 					t.Errorf("[%d]The expected value was %v, but the result was %v.", i, tst.expected, result)
@@ -134,4 +170,8 @@ func TestDiv(t *testing.T) {
 
 func TestRem(t *testing.T) {
 	doOpTests("TestRem", t, remtests)
+}
+
+func TestEq(t *testing.T) {
+	doOpTests("TestEq", t, eqtests)
 }
