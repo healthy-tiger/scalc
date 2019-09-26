@@ -50,7 +50,7 @@ func newOpError(loc parser.Position, id int) *EvalError {
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらのすべてを加算した結果を返す。stringの場合にはオペラントすべてを既定の形式で文字列に変換したものをすべて連結した文字列を返す。
 func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
-		return nil, newOpError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -108,7 +108,7 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを減算した結果を返す。
 func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
-		return nil, newOpError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -150,7 +150,7 @@ func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを乗算した結果を返す。
 func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
-		return nil, newOpError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -192,7 +192,7 @@ func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを除算した結果を返す。
 func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
-		return nil, newOpError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())

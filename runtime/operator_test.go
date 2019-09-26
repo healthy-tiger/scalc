@@ -35,6 +35,7 @@ var addtests []optest = []optest{
 	{`(+ 1 false)`, false, true, nil},
 	{`(+ true false)`, false, true, nil},
 	{`(+ true "true")`, false, true, nil},
+	{`(+)`, false, true, nil},
 }
 
 var subtests []optest = []optest{
@@ -50,6 +51,7 @@ var subtests []optest = []optest{
 	{`(- 1 false)`, false, true, nil},
 	{`(- true false)`, false, true, nil},
 	{`(- true "true")`, false, true, nil},
+	{`(-)`, false, true, nil},
 }
 
 var multests []optest = []optest{
@@ -65,6 +67,7 @@ var multests []optest = []optest{
 	{`(* 1 false)`, false, true, nil},
 	{`(* true false)`, false, true, nil},
 	{`(* true "true")`, false, true, nil},
+	{`(*)`, false, true, nil},
 }
 
 var divtests []optest = []optest{
@@ -82,6 +85,7 @@ var divtests []optest = []optest{
 	{`(/ 1 false)`, false, true, nil},
 	{`(/ true false)`, false, true, nil},
 	{`(/ true "true")`, false, true, nil},
+	{`(/)`, false, true, nil},
 }
 
 var remtests []optest = []optest{
@@ -96,6 +100,8 @@ var remtests []optest = []optest{
 	{`(% 1 false)`, false, true, nil},
 	{`(% true false)`, false, true, nil},
 	{`(% true "true")`, false, true, nil},
+	{`(% 1)`, false, true, nil},
+	{`(%)`, false, true, nil},
 }
 
 var eqtests []optest = []optest{
@@ -108,6 +114,7 @@ var eqtests []optest = []optest{
 	{`(eq 1 1.0)`, false, false, false},
 	{`(eq 1 "1")`, false, false, false},
 	{`(eq 1 true)`, false, false, false},
+	{`(eq 1)`, false, true, false},
 }
 
 func doOpTests(name string, t *testing.T, tests []optest) {
