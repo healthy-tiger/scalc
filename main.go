@@ -14,7 +14,9 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	st := parser.NewSymbolTable()
 	ns := runtime.DefaultNamespace(st)
+	prompt := ">> "
 
+	fmt.Fprint(os.Stdout, prompt)
 	for scanner.Scan() {
 		line := scanner.Text()
 		lists, err := parser.ParseString("stdin", st, line)
@@ -30,5 +32,6 @@ func main() {
 				}
 			}
 		}
+		fmt.Fprint(os.Stdout, prompt)
 	}
 }
