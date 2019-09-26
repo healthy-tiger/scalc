@@ -152,5 +152,6 @@ func DefaultNamespace(st *parser.SymbolTable) *Namespace {
 	ns := NewNamespace(nil)
 	RegisterBoolType(st, ns)
 	RegisterOperators(st, ns)
+	RegisterSetFunc(st, ns)
 	return ns
 }
