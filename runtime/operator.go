@@ -7,37 +7,42 @@ import (
 )
 
 const (
-	addSymbol = "+"
-	subSymbol = "-"
-	mulSymbol = "*"
-	divSymbol = "/"
-	remSymbol = "%"
-	eqSymbol  = "eq" // すべての引数の型と値が一致した場合にtrueになる
-	ltSymbol  = "<"
-	lteSymbol = "<="
-	gtSymbol  = ">"
-	gteSymbol = ">="
-	notSymbol = "not"
+	addSymbol        = "+"
+	subSymbol        = "-"
+	mulSymbol        = "*"
+	divSymbol        = "/"
+	remSymbol        = "%"
+	bitwiseANDSymbol = "&"
+	bitwiseORSymbol  = "|"
+	bitwiseXORSymbol = "^"
+	lestShiftSymbol  = "<<"
+	rightShiftSymbol = ">>"
+	eqSymbol         = "eq" // すべての引数の型と値が一致した場合にtrueになる
+	ltSymbol         = "<"
+	lteSymbol        = "<="
+	gtSymbol         = ">"
+	gteSymbol        = ">="
+	notSymbol        = "not"
 )
 
 // 演算子に関するエラーコード
 var (
-	ErrorOperantMustHaveArithmeticDataType                     int
-	ErrorTheRemainderCannotBeCalculatedUnlessItIsAnIntegerType int
-	ErrorIntegerDivideByZero                                   int
-	ErrorAllOperantsMustBeOfTheSameType                        int
+	ErrorOperantsMustBeNumeric          int
+	ErrorOperantsMustBeOfIntegerType    int
+	ErrorIntegerDivideByZero            int
+	ErrorAllOperantsMustBeOfTheSameType int
 )
 
 func init() {
-	ErrorOperantMustHaveArithmeticDataType = RegisterEvalError("Operant must have arithmetic data type")
-	ErrorTheRemainderCannotBeCalculatedUnlessItIsAnIntegerType = RegisterEvalError("The remainder cannot be calculated unless it is an integer type")
+	ErrorOperantsMustBeNumeric = RegisterEvalError("Operants must be numeric")
+	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type")
 	ErrorIntegerDivideByZero = RegisterEvalError("integer divide by zero")
 	ErrorAllOperantsMustBeOfTheSameType = RegisterEvalError("All operants must be of the same type")
 }
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらのすべてを加算した結果を返す。stringの場合にはオペラントすべてを既定の形式で文字列に変換したものをすべて連結した文字列を返す。
 func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 2 {
+	if lst.Len() < 3 {
 		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	// 引数をすべて評価する。
@@ -60,7 +65,7 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = float64(v) + fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 			}
 		case float64:
 			if iv, ok := params[i].(int64); ok {
@@ -68,7 +73,7 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = v + fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 			}
 		case string:
 			if sv, ok := params[i].(string); ok {
@@ -84,10 +89,10 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 					result = v + falseSymbol
 				}
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType) // TODO ここは違うエラーにすべき
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric) // TODO ここは違うエラーにすべき
 			}
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType) // TODO ここは違うエラーにすべき
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric) // TODO ここは違うエラーにすべき
 		}
 	}
 	return result, nil
@@ -95,7 +100,7 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを減算した結果を返す。
 func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 2 {
+	if lst.Len() < 3 {
 		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	// 引数をすべて評価する。
@@ -118,7 +123,7 @@ func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = float64(v) - fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 			}
 		case float64:
 			if iv, ok := params[i].(int64); ok {
@@ -126,10 +131,10 @@ func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = v - fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 			}
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 		}
 	}
 	return result, nil
@@ -137,7 +142,7 @@ func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを乗算した結果を返す。
 func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 2 {
+	if lst.Len() < 3 {
 		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	// 引数をすべて評価する。
@@ -160,7 +165,7 @@ func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = float64(v) * fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 			}
 		case float64:
 			if iv, ok := params[i].(int64); ok {
@@ -168,10 +173,10 @@ func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = v * fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 			}
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 		}
 	}
 	return result, nil
@@ -179,7 +184,7 @@ func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを除算した結果を返す。
 func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 2 {
+	if lst.Len() < 3 {
 		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	// 引数をすべて評価する。
@@ -205,7 +210,7 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = float64(v) / fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 			}
 		case float64:
 			if iv, ok := params[i].(int64); ok {
@@ -213,10 +218,10 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = v / fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 			}
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantMustHaveArithmeticDataType)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 		}
 	}
 	return result, nil
@@ -246,9 +251,9 @@ func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			}
 			return a % b, nil
 		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTheRemainderCannotBeCalculatedUnlessItIsAnIntegerType)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeOfIntegerType)
 	}
-	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorTheRemainderCannotBeCalculatedUnlessItIsAnIntegerType)
+	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
 }
 
 func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -270,6 +275,94 @@ func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 	return true, nil
 }
 
+func bitwiseANDbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+	// 引数をすべて評価する。
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = ev
+	}
+
+	result, ok := params[1].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+	}
+	for i := 2; i < lst.Len(); i++ {
+		ip, ok := params[i].(int64)
+		if !ok {
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		}
+		result = result & ip
+	}
+	return result, nil
+}
+
+func bitwiseORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+	// 引数をすべて評価する。
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = ev
+	}
+
+	result, ok := params[1].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+	}
+	for i := 2; i < lst.Len(); i++ {
+		ip, ok := params[i].(int64)
+		if !ok {
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		}
+		result = result | ip
+	}
+	return result, nil
+}
+
+func bitwiseXORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 2 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+
+	// 引数をすべて評価する。
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = ev
+	}
+
+	result, ok := params[1].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+	}
+	if lst.Len() == 2 { // 引数が一つのときはビットを反転させて返す。
+		return ^result, nil
+	}
+	for i := 2; i < lst.Len(); i++ {
+		ip, ok := params[i].(int64)
+		if !ok {
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		}
+		result = result ^ ip
+	}
+	return result, nil
+}
+
 // RegisterOperators streeに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, addSymbol, nil, addBody)
@@ -278,4 +371,7 @@ func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, divSymbol, nil, divBody)
 	RegisterExtension(st, ns, remSymbol, nil, remBody)
 	RegisterExtension(st, ns, eqSymbol, nil, eqBody)
+	RegisterExtension(st, ns, bitwiseANDSymbol, nil, bitwiseANDbody)
+	RegisterExtension(st, ns, bitwiseORSymbol, nil, bitwiseORbody)
+	RegisterExtension(st, ns, bitwiseXORSymbol, nil, bitwiseXORbody)
 }

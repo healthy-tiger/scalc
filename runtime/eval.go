@@ -4,8 +4,6 @@ import (
 	"github.com/healthy-tiger/scalc/parser"
 )
 
-// TODO エラーは行と列を返せるようにする。
-
 // Namespace シンボルと値のマップ
 type Namespace struct {
 	root     *Namespace
@@ -104,10 +102,9 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 		if !ok {
 			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol)
 		}
-		// 関数の引数に渡せるのは値のみ。シンボルや関数は渡せない。
-		switch sarg := sv.(type) {
+		switch ev := sv.(type) {
 		case int64, float64, string, bool, Callable:
-			return sarg, nil
+			return ev, nil
 		default:
 			panic("Unexpected evaluation result type")
 		}
