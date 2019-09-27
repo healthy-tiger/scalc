@@ -7,20 +7,16 @@ const (
 )
 
 // set組み込み関数に関するエラーコード
-const (
-	ErrorYouCannotBindAValueToAnythingOtherThanASymbol = iota
-	ErrorYouCannotBindMoreThanOneValueToASymbol        = iota
-	ErrorYouMustSpecifyTheValueToBind                  = iota
+var (
+	ErrorYouCannotBindAValueToAnythingOtherThanASymbol int
+	ErrorYouCannotBindMoreThanOneValueToASymbol        int
+	ErrorYouMustSpecifyTheValueToBind                  int
 )
 
-var setErrorMessages map[int]string
-
 func init() {
-	setErrorMessages = map[int]string{
-		ErrorYouCannotBindAValueToAnythingOtherThanASymbol: "You cannot bind a value to anything other than a symbol.",
-		ErrorYouCannotBindMoreThanOneValueToASymbol:        "You cannot bind more than one value to a symbol.",
-		ErrorYouMustSpecifyTheValueToBind:                  "You must specify the value to bind.",
-	}
+	ErrorYouCannotBindAValueToAnythingOtherThanASymbol = RegisterEvalError("You cannot bind a value to anything other than a symbol.")
+	ErrorYouCannotBindMoreThanOneValueToASymbol = RegisterEvalError("You cannot bind more than one value to a symbol.")
+	ErrorYouMustSpecifyTheValueToBind = RegisterEvalError("You must specify the value to bind.")
 }
 
 func setBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
