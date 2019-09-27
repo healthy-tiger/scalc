@@ -9,13 +9,12 @@ import (
 
 // SymbolTable シンボルIDとシンボル名のマップ
 type SymbolTable struct {
-	symbolMap   map[string]SymbolID
-	symbolCount SymbolID
+	symbolMap map[string]SymbolID
 }
 
 // NewSymbolTable 新しいSymbolTableを作る。
 func NewSymbolTable() *SymbolTable {
-	return &SymbolTable{make(map[string]SymbolID), 0}
+	return &SymbolTable{make(map[string]SymbolID)}
 }
 
 // GetSymbolID はシンボルnameに対するIDを返す。
@@ -23,9 +22,8 @@ func NewSymbolTable() *SymbolTable {
 func (st *SymbolTable) GetSymbolID(name string) SymbolID {
 	n, ok := st.symbolMap[name]
 	if !ok {
-		n = st.symbolCount
-		st.symbolMap[name] = n
-		st.symbolCount = n + 1
+		n = SymbolID(len(st.symbolMap))
+		st.symbolMap[name] = SymbolID(n)
 	}
 	return n
 }
