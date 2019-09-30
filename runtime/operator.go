@@ -15,14 +15,16 @@ const (
 	bitwiseANDSymbol = "&"
 	bitwiseORSymbol  = "|"
 	bitwiseXORSymbol = "^"
-	lestShiftSymbol  = "<<"
-	rightShiftSymbol = ">>"
+	lShiftSymbol     = "<<"
+	rShiftSymbol     = ">>"
 	eqSymbol         = "eq" // すべての引数の型と値が一致した場合にtrueになる
 	ltSymbol         = "<"
 	lteSymbol        = "<="
 	gtSymbol         = ">"
 	gteSymbol        = ">="
 	notSymbol        = "not"
+	andSymbol        = "and"
+	orSymbol         = "or"
 )
 
 // 演算子に関するエラーコード
@@ -363,6 +365,62 @@ func bitwiseXORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 	return result, nil
 }
 
+func lShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+	// 引数をすべて評価する。
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = ev
+	}
+
+	result, ok := params[1].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+	}
+	for i := 2; i < lst.Len(); i++ {
+		ip, ok := params[i].(int64)
+		if !ok {
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		}
+		result = result << ip
+	}
+	return result, nil
+}
+
+func rShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+	// 引数をすべて評価する。
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = ev
+	}
+
+	result, ok := params[1].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+	}
+	for i := 2; i < lst.Len(); i++ {
+		ip, ok := params[i].(int64)
+		if !ok {
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		}
+		result = result >> ip
+	}
+	return result, nil
+}
+
 // RegisterOperators streeに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, addSymbol, nil, addBody)
@@ -374,4 +432,6 @@ func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, bitwiseANDSymbol, nil, bitwiseANDbody)
 	RegisterExtension(st, ns, bitwiseORSymbol, nil, bitwiseORbody)
 	RegisterExtension(st, ns, bitwiseXORSymbol, nil, bitwiseXORbody)
+	RegisterExtension(st, ns, lShiftSymbol, nil, lShiftBody)
+	RegisterExtension(st, ns, rShiftSymbol, nil, rShiftBody)
 }
