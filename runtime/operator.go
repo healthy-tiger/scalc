@@ -200,28 +200,21 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	}
 
 	// 引数を最初の引数の型に合わせながらすべて加算する。
-	result := params[1]
+	var result float64
+	switch lv := params[1].(type) {
+	case int64:
+		result = float64(lv)
+	case float64:
+		result = lv
+	default:
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+	}
 	for i := 2; i < lst.Len(); i++ {
-		switch v := result.(type) {
+		switch rv := params[i].(type) {
 		case int64:
-			if iv, ok := params[i].(int64); ok {
-				if iv == 0 { // ゼロ割のチェック
-					return nil, newEvalError(lst.ElementAt(i).Position(), ErrorIntegerDivideByZero)
-				}
-				result = v / iv
-			} else if fv, ok := params[i].(float64); ok {
-				result = float64(v) / fv
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
-			}
+			result = result / float64(rv)
 		case float64:
-			if iv, ok := params[i].(int64); ok {
-				result = v / float64(iv)
-			} else if fv, ok := params[i].(float64); ok {
-				result = v / fv
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
-			}
+			result = result / rv
 		default:
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 		}
