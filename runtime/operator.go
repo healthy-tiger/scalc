@@ -421,6 +421,166 @@ func rShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 	return result, nil
 }
 
+func ltBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	// 要するにオペラントは2つしか許容しない
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	} else if lst.Len() > 3 {
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+	}
+	// 引数をすべて評価する。
+	pa, err := EvalElement(lst.ElementAt(1), ns)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := EvalElement(lst.ElementAt(2), ns)
+	if err != nil {
+		return nil, err
+	}
+	switch a := pa.(type) {
+	case int64:
+		switch b := pb.(type) {
+		case int64:
+			return a < b, nil
+		case float64:
+			return float64(a) < b, nil
+		default:
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+		}
+	case float64:
+		switch b := pb.(type) {
+		case int64:
+			return a < float64(b), nil
+		case float64:
+			return a < b, nil
+		default:
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+		}
+	default:
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+	}
+}
+
+func lteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	// 要するにオペラントは2つしか許容しない
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	} else if lst.Len() > 3 {
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+	}
+	// 引数をすべて評価する。
+	pa, err := EvalElement(lst.ElementAt(1), ns)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := EvalElement(lst.ElementAt(2), ns)
+	if err != nil {
+		return nil, err
+	}
+	switch a := pa.(type) {
+	case int64:
+		switch b := pb.(type) {
+		case int64:
+			return a <= b, nil
+		case float64:
+			return float64(a) <= b, nil
+		default:
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+		}
+	case float64:
+		switch b := pb.(type) {
+		case int64:
+			return a <= float64(b), nil
+		case float64:
+			return a <= b, nil
+		default:
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+		}
+	default:
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+	}
+}
+
+func gtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	// 要するにオペラントは2つしか許容しない
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	} else if lst.Len() > 3 {
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+	}
+	// 引数をすべて評価する。
+	pa, err := EvalElement(lst.ElementAt(1), ns)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := EvalElement(lst.ElementAt(2), ns)
+	if err != nil {
+		return nil, err
+	}
+	switch a := pa.(type) {
+	case int64:
+		switch b := pb.(type) {
+		case int64:
+			return a > b, nil
+		case float64:
+			return float64(a) > b, nil
+		default:
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+		}
+	case float64:
+		switch b := pb.(type) {
+		case int64:
+			return a > float64(b), nil
+		case float64:
+			return a > b, nil
+		default:
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+		}
+	default:
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+	}
+}
+
+func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	// 要するにオペラントは2つしか許容しない
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	} else if lst.Len() > 3 {
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+	}
+	// 引数をすべて評価する。
+	pa, err := EvalElement(lst.ElementAt(1), ns)
+	if err != nil {
+		return nil, err
+	}
+	pb, err := EvalElement(lst.ElementAt(2), ns)
+	if err != nil {
+		return nil, err
+	}
+	switch a := pa.(type) {
+	case int64:
+		switch b := pb.(type) {
+		case int64:
+			return a >= b, nil
+		case float64:
+			return float64(a) >= b, nil
+		default:
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+		}
+	case float64:
+		switch b := pb.(type) {
+		case int64:
+			return a >= float64(b), nil
+		case float64:
+			return a >= b, nil
+		default:
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+		}
+	default:
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+	}
+}
+
 // RegisterOperators streeに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, addSymbol, nil, addBody)
@@ -434,4 +594,8 @@ func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, bitwiseXORSymbol, nil, bitwiseXORbody)
 	RegisterExtension(st, ns, lShiftSymbol, nil, lShiftBody)
 	RegisterExtension(st, ns, rShiftSymbol, nil, rShiftBody)
+	RegisterExtension(st, ns, ltSymbol, nil, ltBody)
+	RegisterExtension(st, ns, lteSymbol, nil, lteBody)
+	RegisterExtension(st, ns, gtSymbol, nil, gtBody)
+	RegisterExtension(st, ns, gteSymbol, nil, gteBody)
 }
