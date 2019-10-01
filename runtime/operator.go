@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/healthy-tiger/scalc/parser"
@@ -11,12 +12,11 @@ const (
 	subSymbol        = "-"
 	mulSymbol        = "*"
 	divSymbol        = "/"
-	remSymbol        = "%"
-	bitwiseANDSymbol = "&"
-	bitwiseORSymbol  = "|"
-	bitwiseXORSymbol = "^"
-	lShiftSymbol     = "<<"
-	rShiftSymbol     = ">>"
+	bitwiseANDSymbol = "band"
+	bitwiseORSymbol  = "bor"
+	bitwiseXORSymbol = "bxor"
+	lShiftSymbol     = "lshift"
+	rShiftSymbol     = "rshift"
 	eqSymbol         = "eq" // すべての引数の型と値が一致した場合にtrueになる
 	ltSymbol         = "<"
 	lteSymbol        = "<="
@@ -219,36 +219,12 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
 		}
 	}
-	return result, nil
-}
 
-// Eval 2つのオペラントの評価結果がすべてint64の場合に最初の引数を次の引数で割った余りを返す。
-func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	// 要するにオペラントは2つしか許容しない
-	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
-	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+	// 整数型に変換できそうならしてから返す。
+	if math.Abs(result-math.Trunc(result)) > 0 {
+		return result, nil
 	}
-	// 引数をすべて評価する。
-	pa, err := EvalElement(lst.ElementAt(1), ns)
-	if err != nil {
-		return nil, err
-	}
-	pb, err := EvalElement(lst.ElementAt(2), ns)
-	if err != nil {
-		return nil, err
-	}
-	if a, ok := pa.(int64); ok {
-		if b, ok := pb.(int64); ok {
-			if b == 0 {
-				return nil, newEvalError(lst.ElementAt(2).Position(), ErrorIntegerDivideByZero)
-			}
-			return a % b, nil
-		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeOfIntegerType)
-	}
-	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+	return int64(result), nil
 }
 
 func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -574,13 +550,12 @@ func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	}
 }
 
-// RegisterOperators streeに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
+// RegisterOperators stに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, addSymbol, nil, addBody)
 	RegisterExtension(st, ns, subSymbol, nil, subBody)
 	RegisterExtension(st, ns, mulSymbol, nil, mulBody)
 	RegisterExtension(st, ns, divSymbol, nil, divBody)
-	RegisterExtension(st, ns, remSymbol, nil, remBody)
 	RegisterExtension(st, ns, eqSymbol, nil, eqBody)
 	RegisterExtension(st, ns, bitwiseANDSymbol, nil, bitwiseANDbody)
 	RegisterExtension(st, ns, bitwiseORSymbol, nil, bitwiseORbody)
