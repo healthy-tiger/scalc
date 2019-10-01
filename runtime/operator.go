@@ -33,6 +33,7 @@ var (
 	ErrorOperantsMustBeOfIntegerType    int
 	ErrorIntegerDivideByZero            int
 	ErrorAllOperantsMustBeOfTheSameType int
+	ErrorOperantsMustBeBoolean          int
 )
 
 func init() {
@@ -40,6 +41,7 @@ func init() {
 	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type")
 	ErrorIntegerDivideByZero = RegisterEvalError("integer divide by zero")
 	ErrorAllOperantsMustBeOfTheSameType = RegisterEvalError("All operants must be of the same type")
+	ErrorOperantsMustBeBoolean = RegisterEvalError("Operants must be boolen")
 }
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらのすべてを加算した結果を返す。stringの場合にはオペラントすべてを既定の形式で文字列に変換したものをすべて連結した文字列を返す。
@@ -550,6 +552,67 @@ func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	}
 }
 
+func notBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	// 要するに引数は必ず一つ
+	if lst.Len() < 2 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	} else if lst.Len() > 2 {
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTooManyArguments)
+	}
+	p, err := EvalElement(lst.ElementAt(1), ns)
+	if err != nil {
+		return nil, err
+	}
+	if b, ok := p.(bool); ok {
+		return !b, nil
+	}
+	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeBoolean)
+}
+
+func andBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+	// 引数を順に評価し、評価結果がfalseになったところで止めてfalseを返す。
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		bv, ok := ev.(bool)
+		if !ok {
+			// 評価結果がboolに変換できない場合はエラーになる。
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeBoolean)
+		}
+		if !bv {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func orBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+	// 引数を順に評価し、評価結果がtrueになったところで止めてtrueを返す。
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		bv, ok := ev.(bool)
+		if !ok {
+			// 評価結果がboolに変換できない場合はエラーになる。
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeBoolean)
+		}
+		if bv {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 // RegisterOperators stに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, addSymbol, nil, addBody)
@@ -566,4 +629,7 @@ func RegisterOperators(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, lteSymbol, nil, lteBody)
 	RegisterExtension(st, ns, gtSymbol, nil, gtBody)
 	RegisterExtension(st, ns, gteSymbol, nil, gteBody)
+	RegisterExtension(st, ns, notSymbol, nil, notBody)
+	RegisterExtension(st, ns, andSymbol, nil, andBody)
+	RegisterExtension(st, ns, orSymbol, nil, orBody)
 }
