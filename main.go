@@ -13,7 +13,8 @@ import (
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	st := parser.NewSymbolTable()
-	ns := runtime.DefaultNamespace(st)
+	ns := runtime.NewNamespace(nil)
+	runtime.DefaultNamespace(st, ns)
 	prompt := ">> "
 
 	fmt.Fprint(os.Stdout, prompt)

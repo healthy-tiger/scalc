@@ -126,7 +126,8 @@ func doOpTests(name string, t *testing.T, tests []optest) {
 				t.Errorf("[%d]Parse error: %v\n", i, err)
 			}
 		} else {
-			ns := runtime.DefaultNamespace(st)
+			ns := runtime.NewNamespace(nil)
+			runtime.DefaultNamespace(st, ns)
 			result, err := runtime.EvalList(lists[0], ns)
 			if err != nil {
 				if !tst.evalError {

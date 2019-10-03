@@ -145,11 +145,9 @@ func RegisterExtension(st *parser.SymbolTable, ns *Namespace, symbolName string,
 }
 
 // DefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
-func DefaultNamespace(st *parser.SymbolTable) *Namespace {
-	ns := NewNamespace(nil)
+func DefaultNamespace(st *parser.SymbolTable, ns *Namespace) {
 	RegisterBoolType(st, ns)
 	RegisterOperators(st, ns)
 	RegisterMath(st, ns)
-	RegisterSetFunc(st, ns)
-	return ns
+	RegisterStmt(st, ns)
 }

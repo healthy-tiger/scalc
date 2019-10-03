@@ -37,7 +37,7 @@ func setBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	return v, nil
 }
 
-// RegisterSetFunc set組み込み関数を登録する。
-func RegisterSetFunc(st *parser.SymbolTable, ns *Namespace) {
+// RegisterStmt 文に関する拡張関数を登録する。
+func RegisterStmt(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, setSymbol, nil, setBody)
 }
