@@ -11,6 +11,7 @@ const (
 	ifSymbol    = "if"
 	whileSymbol = "while"
 	printSymbol = "print"
+	beginSymbol = "begin"
 )
 
 // set組み込み関数に関するエラーコード
@@ -98,6 +99,7 @@ func whileBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 	return result, nil
 }
 
+// printBody fmt.Printlnを呼び出して結果をそのまま返す。
 func printBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	params := make([]interface{}, lst.Len()-1)
 	for i := 1; i < lst.Len(); i++ {
@@ -110,10 +112,26 @@ func printBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 	return fmt.Println(params...)
 }
 
+func beginBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 2 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+	}
+	var result interface{} = nil
+	var err error = nil
+	for i := 1; i < lst.Len(); i++ {
+		result, err = EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
+}
+
 // RegisterStmt 文に関する拡張関数を登録する。
 func RegisterStmt(st *parser.SymbolTable, ns *Namespace) {
 	RegisterExtension(st, ns, setSymbol, nil, setBody)
 	RegisterExtension(st, ns, ifSymbol, nil, ifBody)
 	RegisterExtension(st, ns, printSymbol, nil, printBody)
 	RegisterExtension(st, ns, whileSymbol, nil, whileBody)
+	RegisterExtension(st, ns, beginSymbol, nil, beginBody)
 }
