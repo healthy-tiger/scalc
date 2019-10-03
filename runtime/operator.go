@@ -37,17 +37,17 @@ var (
 )
 
 func init() {
-	ErrorOperantsMustBeNumeric = RegisterEvalError("Operants must be numeric")
-	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type")
+	ErrorOperantsMustBeNumeric = RegisterEvalError("Operants must be numeric: \"%v\"")
+	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type: \"%v\"")
 	ErrorIntegerDivideByZero = RegisterEvalError("integer divide by zero")
 	ErrorAllOperantsMustBeOfTheSameType = RegisterEvalError("All operants must be of the same type")
-	ErrorOperantsMustBeBoolean = RegisterEvalError("Operants must be boolen")
+	ErrorOperantsMustBeBoolean = RegisterEvalError("Operants must be boolen: \"%v\"")
 }
 
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらのすべてを加算した結果を返す。stringの場合にはオペラントすべてを既定の形式で文字列に変換したものをすべて連結した文字列を返す。
 func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -69,7 +69,7 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = float64(v) + fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 			}
 		case float64:
 			if iv, ok := params[i].(int64); ok {
@@ -77,7 +77,7 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = v + fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 			}
 		case string:
 			if sv, ok := params[i].(string); ok {
@@ -93,10 +93,10 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 					result = v + falseSymbol
 				}
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric) // TODO ここは違うエラーにすべき
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i]) // TODO ここは違うエラーにすべき
 			}
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric) // TODO ここは違うエラーにすべき
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i]) // TODO ここは違うエラーにすべき
 		}
 	}
 	return result, nil
@@ -105,7 +105,7 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを減算した結果を返す。
 func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -127,7 +127,7 @@ func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = float64(v) - fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 			}
 		case float64:
 			if iv, ok := params[i].(int64); ok {
@@ -135,10 +135,10 @@ func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = v - fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 			}
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 	}
 	return result, nil
@@ -147,7 +147,7 @@ func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを乗算した結果を返す。
 func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -169,7 +169,7 @@ func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = float64(v) * fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 			}
 		case float64:
 			if iv, ok := params[i].(int64); ok {
@@ -177,10 +177,10 @@ func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			} else if fv, ok := params[i].(float64); ok {
 				result = v * fv
 			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 			}
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 	}
 	return result, nil
@@ -189,7 +189,7 @@ func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 // Eval オペラントの評価結果がすべてint64またはfloat64の値の場合にそれらすべてを除算した結果を返す。
 func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -209,7 +209,7 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	case float64:
 		result = lv
 	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
 		switch rv := params[i].(type) {
@@ -218,7 +218,7 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		case float64:
 			result = result / rv
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 	}
 
@@ -231,7 +231,7 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	l, err := EvalElement(lst.ElementAt(1), ns)
 	if err != nil {
@@ -250,7 +250,7 @@ func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 
 func bitwiseANDbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -264,12 +264,12 @@ func bitwiseANDbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 
 	result, ok := params[1].(int64)
 	if !ok {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
 		ip, ok := params[i].(int64)
 		if !ok {
-			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
 		result = result & ip
 	}
@@ -278,7 +278,7 @@ func bitwiseANDbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 
 func bitwiseORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -292,12 +292,12 @@ func bitwiseORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{},
 
 	result, ok := params[1].(int64)
 	if !ok {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
 		ip, ok := params[i].(int64)
 		if !ok {
-			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
 		result = result | ip
 	}
@@ -306,7 +306,7 @@ func bitwiseORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{},
 
 func bitwiseXORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 
 	// 引数をすべて評価する。
@@ -321,7 +321,7 @@ func bitwiseXORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 
 	result, ok := params[1].(int64)
 	if !ok {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	if lst.Len() == 2 { // 引数が一つのときはビットを反転させて返す。
 		return ^result, nil
@@ -329,7 +329,7 @@ func bitwiseXORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 	for i := 2; i < lst.Len(); i++ {
 		ip, ok := params[i].(int64)
 		if !ok {
-			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
 		result = result ^ ip
 	}
@@ -338,7 +338,7 @@ func bitwiseXORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 
 func lShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -352,12 +352,12 @@ func lShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 
 	result, ok := params[1].(int64)
 	if !ok {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
 		ip, ok := params[i].(int64)
 		if !ok {
-			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
 		result = result << ip
 	}
@@ -366,7 +366,7 @@ func lShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 
 func rShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -380,12 +380,12 @@ func rShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 
 	result, ok := params[1].(int64)
 	if !ok {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
 		ip, ok := params[i].(int64)
 		if !ok {
-			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType)
+			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
 		result = result >> ip
 	}
@@ -395,9 +395,9 @@ func rShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 func ltBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 要するにオペラントは2つしか許容しない
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
 	}
 	// 引数をすべて評価する。
 	pa, err := EvalElement(lst.ElementAt(1), ns)
@@ -416,7 +416,7 @@ func ltBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		case float64:
 			return float64(a) < b, nil
 		default:
-			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric, pb)
 		}
 	case float64:
 		switch b := pb.(type) {
@@ -425,19 +425,19 @@ func ltBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		case float64:
 			return a < b, nil
 		default:
-			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric, pb)
 		}
 	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric, pa)
 	}
 }
 
 func lteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 要するにオペラントは2つしか許容しない
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
 	}
 	// 引数をすべて評価する。
 	pa, err := EvalElement(lst.ElementAt(1), ns)
@@ -456,7 +456,7 @@ func lteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		case float64:
 			return float64(a) <= b, nil
 		default:
-			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric, pb)
 		}
 	case float64:
 		switch b := pb.(type) {
@@ -465,19 +465,19 @@ func lteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		case float64:
 			return a <= b, nil
 		default:
-			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric, pb)
 		}
 	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric, pa)
 	}
 }
 
 func gtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 要するにオペラントは2つしか許容しない
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
 	}
 	// 引数をすべて評価する。
 	pa, err := EvalElement(lst.ElementAt(1), ns)
@@ -496,7 +496,7 @@ func gtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		case float64:
 			return float64(a) > b, nil
 		default:
-			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric, pb)
 		}
 	case float64:
 		switch b := pb.(type) {
@@ -505,19 +505,19 @@ func gtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		case float64:
 			return a > b, nil
 		default:
-			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric, pb)
 		}
 	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric, pa)
 	}
 }
 
 func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 要するにオペラントは2つしか許容しない
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
 	}
 	// 引数をすべて評価する。
 	pa, err := EvalElement(lst.ElementAt(1), ns)
@@ -536,7 +536,7 @@ func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		case float64:
 			return float64(a) >= b, nil
 		default:
-			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric, pb)
 		}
 	case float64:
 		switch b := pb.(type) {
@@ -545,19 +545,19 @@ func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		case float64:
 			return a >= b, nil
 		default:
-			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(2).Position(), ErrorOperantsMustBeNumeric, pb)
 		}
 	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric, pa)
 	}
 }
 
 func notBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 要するに引数は必ず一つ
 	if lst.Len() < 2 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	} else if lst.Len() > 2 {
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTooManyArguments)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTooManyArguments, nil)
 	}
 	p, err := EvalElement(lst.ElementAt(1), ns)
 	if err != nil {
@@ -566,12 +566,12 @@ func notBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	if b, ok := p.(bool); ok {
 		return !b, nil
 	}
-	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeBoolean)
+	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeBoolean, p)
 }
 
 func andBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数を順に評価し、評価結果がfalseになったところで止めてfalseを返す。
 	for i := 1; i < lst.Len(); i++ {
@@ -582,7 +582,7 @@ func andBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		bv, ok := ev.(bool)
 		if !ok {
 			// 評価結果がboolに変換できない場合はエラーになる。
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeBoolean)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeBoolean, ev)
 		}
 		if !bv {
 			return false, nil
@@ -593,7 +593,7 @@ func andBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func orBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数を順に評価し、評価結果がtrueになったところで止めてtrueを返す。
 	for i := 1; i < lst.Len(); i++ {
@@ -604,7 +604,7 @@ func orBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		bv, ok := ev.(bool)
 		if !ok {
 			// 評価結果がboolに変換できない場合はエラーになる。
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeBoolean)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeBoolean, ev)
 		}
 		if bv {
 			return true, nil

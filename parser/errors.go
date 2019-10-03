@@ -1,9 +1,8 @@
 package parser
 
 import (
-	"bytes"
 	"errors"
-	"strconv"
+	"fmt"
 )
 
 // 内部エラーの定義
@@ -33,11 +32,11 @@ func init() {
 	errorMessages = map[int]string{
 		ErrorUnmatchedParenthesis:           "Unmatched parenthesis",
 		ErrorUnexpectedToken:                "Unexpected token",
-		ErrorUnexpectedInputChar:            "Unexpected input char",
+		ErrorUnexpectedInputChar:            "Unexpected input char '%c'",
 		ErrorInsufficientInput:              "Insufficient input",
 		ErrorFirstElementTypeMustBeASymbol:  "First element type must be a symbol",
 		ErrorStringLiteralMustBeASingleLine: "String literal must be a single line",
-		ErrorIllegalEscapeSequence:          "Illegal escape sequence",
+		ErrorIllegalEscapeSequence:          "Illegal escape sequence '%c'",
 		ErrorNotStringLiteral:               "Not string literal",
 		ErrorTopLevelElementMustBeAList:     "Top-level element must be a list",
 		ErrorMissingClosingParenthesis:      "Missing closing parenthesis",
@@ -48,23 +47,21 @@ func init() {
 type ParseError struct {
 	ErrorLocation Position
 	ID            int
+	Arg           interface{}
 }
 
 func (err *ParseError) Error() string {
-	var b bytes.Buffer
-	b.WriteString(err.ErrorLocation.Filename)
-	b.WriteString(":")
-	b.WriteString(strconv.FormatInt(int64(err.ErrorLocation.Line), 10))
-	b.WriteString(":")
-	b.WriteString(strconv.FormatInt(int64(err.ErrorLocation.Column), 10))
-	b.WriteString(" ")
-	b.WriteString(errorMessages[err.ID])
-	return b.String()
+	h := fmt.Sprintf("%s:%d:%d ", err.ErrorLocation.Filename, err.ErrorLocation.Line, err.ErrorLocation.Column)
+	m := errorMessages[err.ID]
+	if err.Arg != nil {
+		m = fmt.Sprintf(m, err.Arg)
+	}
+	return h + m
 }
 
-func newError(filename string, line int, column int, messageid int) *ParseError {
+func newError(filename string, line int, column int, messageid int, arg interface{}) *ParseError {
 	if _, ok := errorMessages[messageid]; !ok {
 		panic("Undefined error id")
 	}
-	return &ParseError{Position{filename, line, column}, messageid}
+	return &ParseError{Position{filename, line, column}, messageid, arg}
 }

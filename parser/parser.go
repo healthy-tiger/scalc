@@ -55,12 +55,12 @@ func Parse(filename string, st *SymbolTable, src io.Reader) ([]*List, error) {
 	}
 	tok, line, column, err := tokenizer.scan()
 	for err == nil {
+		toktxt := tokenizer.tokentext()
 		switch tok {
 		case symbol:
-			toktxt := tokenizer.tokentext()
 			lst := stack.peek()
 			if lst == nil {
-				return nil, newError(filename, line, column, ErrorTopLevelElementMustBeAList)
+				return nil, newError(filename, line, column, ErrorTopLevelElementMustBeAList, nil)
 			}
 			// IntかFloatとして処理できるか先に確認し、どちらもダメならシンボルにする。
 			vi, err := strconv.ParseInt(toktxt, 0, 64)
@@ -78,9 +78,9 @@ func Parse(filename string, st *SymbolTable, src io.Reader) ([]*List, error) {
 		case stringLiteral:
 			lst := stack.peek()
 			if lst == nil {
-				return nil, newError(filename, line, column, ErrorTopLevelElementMustBeAList)
+				return nil, newError(filename, line, column, ErrorTopLevelElementMustBeAList, nil)
 			}
-			lst.elements = append(lst.elements, newLiteral(tokenizer.tokentext(), filename, line, column))
+			lst.elements = append(lst.elements, newLiteral(toktxt, filename, line, column))
 
 		case commentText:
 
@@ -97,11 +97,11 @@ func Parse(filename string, st *SymbolTable, src io.Reader) ([]*List, error) {
 			} else if tok == rightParenthesis || tok == rightSquareBracket || tok == rightCurlyBracket {
 				lst := stack.peek()
 				if lst == nil || !lst.isMatchingParen(tok) {
-					return nil, newError(filename, line, column, ErrorUnexpectedInputChar)
+					return nil, newError(filename, line, column, ErrorUnexpectedInputChar, tok)
 				}
 				stack.pop()
 			} else if tok != tab && tok != space {
-				return nil, newError(filename, line, column, ErrorUnexpectedInputChar)
+				return nil, newError(filename, line, column, ErrorUnexpectedInputChar, tok)
 			}
 		}
 		tok, line, column, err = tokenizer.scan()
@@ -111,7 +111,7 @@ func Parse(filename string, st *SymbolTable, src io.Reader) ([]*List, error) {
 		return nil, err
 	}
 	if stack.peek() != nil {
-		return nil, newError(filename, line, column, ErrorMissingClosingParenthesis)
+		return nil, newError(filename, line, column, ErrorMissingClosingParenthesis, nil)
 	}
 	return lists, nil
 }

@@ -30,12 +30,12 @@ func init() {
 func setBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	sid, ok := lst.SymbolAt(1)
 	if !ok {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorYouCannotBindAValueToAnythingOtherThanASymbol)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorYouCannotBindAValueToAnythingOtherThanASymbol, nil)
 	}
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorYouMustSpecifyTheValueToBind)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorYouMustSpecifyTheValueToBind, nil)
 	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.ElementAt(3).Position(), ErrorYouCannotBindMoreThanOneValueToASymbol)
+		return nil, newEvalError(lst.ElementAt(3).Position(), ErrorYouCannotBindMoreThanOneValueToASymbol, nil)
 	}
 	v, err := EvalElement(lst.ElementAt(2), ns)
 	if err != nil {
@@ -47,9 +47,9 @@ func setBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func ifBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 4 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	} else if lst.Len() > 4 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
 	}
 	p, err := EvalElement(lst.ElementAt(1), ns)
 	if err != nil {
@@ -61,7 +61,7 @@ func ifBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		}
 		return EvalElement(lst.ElementAt(3), ns)
 	}
-	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeBoolean)
+	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeBoolean, p)
 }
 
 func evalAsBool(elm parser.SyntaxElement, ns *Namespace) (bool, error) {
@@ -73,14 +73,14 @@ func evalAsBool(elm parser.SyntaxElement, ns *Namespace) (bool, error) {
 	if ok {
 		return c, nil
 	}
-	return false, newEvalError(elm.Position(), ErrorOperantsMustBeBoolean)
+	return false, newEvalError(elm.Position(), ErrorOperantsMustBeBoolean, r)
 }
 
 func whileBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments)
+		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
 	}
 
 	condelm := lst.ElementAt(1)
@@ -114,7 +114,7 @@ func printBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func beginBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	var result interface{} = nil
 	var err error = nil

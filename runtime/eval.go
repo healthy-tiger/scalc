@@ -66,7 +66,7 @@ type Function struct {
 // Eval 関数fを引数agrsと、グローバルの名前空間globalsで評価し、その結果を返す。
 func (f *Function) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 	if len(f.params) != lst.Len()-1 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch)
+		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, nil)
 	}
 	// 呼び出し先（の関数を実行する際）の名前空間を定義。最上位の名前空間以外は呼び出し元と名前空間を共有しない。
 	lns := NewNamespace(ns.Root())
@@ -100,7 +100,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 	if sid, ok := st.SymbolValue(); ok {
 		sv, ok := ns.Get(sid)
 		if !ok {
-			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol)
+			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol, nil)
 		}
 		switch ev := sv.(type) {
 		case int64, float64, string, bool, Callable:
@@ -123,7 +123,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 func EvalList(lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 空のリストは評価できないのでエラー(Excentionがリストを評価する場合はExtentionsによる）
 	if lst.Len() == 0 {
-		return nil, newEvalError(lst.Position(), ErrorAnEmptyListIsNotAllowed)
+		return nil, newEvalError(lst.Position(), ErrorAnEmptyListIsNotAllowed, nil)
 	}
 	// 最初の要素は必ずシンボルで、呼び出し可能なオブジェクト（*FunctionかExtensionにバインドされていなければならない）
 	first := lst.ElementAt(0)
@@ -134,7 +134,7 @@ func EvalList(lst *parser.List, ns *Namespace) (interface{}, error) {
 	if c, ok := callable.(Callable); ok {
 		return c.Eval(lst, ns)
 	}
-	return nil, newEvalError(first.Position(), ErrorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject)
+	return nil, newEvalError(first.Position(), ErrorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject, callable)
 }
 
 // RegisterExtension 拡張関数を登録する。

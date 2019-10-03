@@ -96,7 +96,7 @@ func (ss *stokenizer) readString() (string, int, error) {
 				} else if r == 'x' {
 					stat = ctxEscHex
 				} else {
-					return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence)
+					return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence, r)
 				}
 			}
 
@@ -106,7 +106,7 @@ func (ss *stokenizer) readString() (string, int, error) {
 				stat = ctxEscOctet2
 				oct = oct*8 + ov
 			} else {
-				return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence)
+				return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence, r)
 			}
 
 		case ctxEscOctet2:
@@ -116,7 +116,7 @@ func (ss *stokenizer) readString() (string, int, error) {
 				oct = oct*8 + ov
 				runes = append(runes, oct)
 			} else {
-				return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence)
+				return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence, r)
 			}
 
 		case ctxEscHex:
@@ -125,7 +125,7 @@ func (ss *stokenizer) readString() (string, int, error) {
 				stat = ctxEscHex1
 				hex = hv
 			} else {
-				return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence)
+				return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence, r)
 			}
 
 		case ctxEscHex1:
@@ -135,12 +135,12 @@ func (ss *stokenizer) readString() (string, int, error) {
 				hex = hex*16 + hv
 				runes = append(runes, hex)
 			} else {
-				return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence)
+				return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorIllegalEscapeSequence, r)
 			}
 		}
 		r, sz, err = ss.reader.ReadRune()
 	}
-	return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorStringLiteralMustBeASingleLine) // 文字列リテラルが行末で閉じられなかった
+	return "", nr, newError(ss.inputname, ss.line, ss.column, ErrorStringLiteralMustBeASingleLine, nil) // 文字列リテラルが行末で閉じられなかった
 }
 
 func (ss *stokenizer) readSymbol() (string, int, error) {

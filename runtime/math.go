@@ -14,7 +14,7 @@ const (
 // idivBody 引数をすべて整数型に変換してから除算を行う。
 func idivBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -34,7 +34,7 @@ func idivBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 	case float64:
 		result = int64(ir)
 	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric, params[1])
 	}
 	// ２番目以降の引数を整数型に変換しながら剰余を求めていく。
 	for i := 2; i < lst.Len(); i++ {
@@ -45,10 +45,10 @@ func idivBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 		case float64:
 			t = int64(v)
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 		if t == 0 {
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorIntegerDivideByZero)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorIntegerDivideByZero, nil)
 		}
 		result = result / t
 	}
@@ -58,7 +58,7 @@ func idivBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 // remBody 引数をすべて整数型に変換してから剰余を求める。
 func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -78,7 +78,7 @@ func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	case float64:
 		result = int64(ir)
 	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeNumeric, params[1])
 	}
 	// ２番目以降の引数を整数型に変換しながら剰余を求めていく。
 	for i := 2; i < lst.Len(); i++ {
@@ -89,10 +89,10 @@ func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		case float64:
 			t = int64(v)
 		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 		if t == 0 {
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorIntegerDivideByZero)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorIntegerDivideByZero, nil)
 		}
 		result = result % t
 	}
