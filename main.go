@@ -20,7 +20,7 @@ func main() {
 	fmt.Fprint(os.Stdout, prompt)
 	for scanner.Scan() {
 		line := scanner.Text()
-		lists, err := parser.ParseString("stdin", st, line)
+		lists, err := parser.ParseString("<stdin>", st, line)
 		if err != nil && err != io.EOF {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 		} else {
@@ -29,7 +29,7 @@ func main() {
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "error: %v\n", err)
 				} else {
-					fmt.Printf("result: %v\n", result)
+					fmt.Printf("%v\n", result)
 				}
 			}
 		}

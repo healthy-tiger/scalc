@@ -52,13 +52,12 @@ type ParseError struct {
 
 func (err *ParseError) Error() string {
 	var b bytes.Buffer
-	b.WriteString("[Parse Error ")
 	b.WriteString(err.ErrorLocation.Filename)
-	b.WriteString(" ")
+	b.WriteString(":")
 	b.WriteString(strconv.FormatInt(int64(err.ErrorLocation.Line), 10))
 	b.WriteString(":")
 	b.WriteString(strconv.FormatInt(int64(err.ErrorLocation.Column), 10))
-	b.WriteString("] ")
+	b.WriteString(" ")
 	b.WriteString(errorMessages[err.ID])
 	return b.String()
 }
