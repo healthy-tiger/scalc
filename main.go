@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -10,13 +11,9 @@ import (
 	"github.com/healthy-tiger/scalc/runtime"
 )
 
-func main() {
+func runEval(st *parser.SymbolTable, ns *runtime.Namespace) {
 	scanner := bufio.NewScanner(os.Stdin)
-	st := parser.NewSymbolTable()
-	ns := runtime.NewNamespace(nil)
-	runtime.DefaultNamespace(st, ns)
 	prompt := ">> "
-
 	fmt.Fprint(os.Stdout, prompt)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -34,5 +31,36 @@ func main() {
 			}
 		}
 		fmt.Fprint(os.Stdout, prompt)
+	}
+}
+
+func main() {
+	interactive := false
+	flag.BoolVar(&interactive, "i", false, "interactive mode")
+	flag.Parse()
+
+	st := parser.NewSymbolTable()
+	ns := runtime.NewNamespace(nil)
+	runtime.DefaultNamespace(st, ns)
+
+	for _, v := range flag.Args() {
+		f, err := os.Open(v)
+		if err != nil {
+			fmt.Println(err)
+		}
+		lst, err := parser.Parse(v, st, f)
+		if err != nil {
+			fmt.Println(err)
+		}
+		for _, l := range lst {
+			_, err := runtime.EvalList(l, ns)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+	}
+
+	if interactive {
+		runEval(st, ns)
 	}
 }
