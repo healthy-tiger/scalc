@@ -31,7 +31,7 @@ const (
 var (
 	ErrorOperantsMustBeNumeric          int
 	ErrorOperantsMustBeOfIntegerType    int
-	ErrorIntegerDivideByZero            int
+	ErrorDivisionByZero                 int
 	ErrorAllOperantsMustBeOfTheSameType int
 	ErrorOperantsMustBeBoolean          int
 )
@@ -39,7 +39,7 @@ var (
 func init() {
 	ErrorOperantsMustBeNumeric = RegisterEvalError("Operants must be numeric: \"%v\"")
 	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type: \"%v\"")
-	ErrorIntegerDivideByZero = RegisterEvalError("integer divide by zero")
+	ErrorDivisionByZero = RegisterEvalError("Division by zero")
 	ErrorAllOperantsMustBeOfTheSameType = RegisterEvalError("All operants must be of the same type")
 	ErrorOperantsMustBeBoolean = RegisterEvalError("Operants must be boolen: \"%v\"")
 }

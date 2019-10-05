@@ -48,7 +48,7 @@ func idivBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 		if t == 0 {
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorIntegerDivideByZero, nil)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero, nil)
 		}
 		result = result / t
 	}
@@ -92,7 +92,7 @@ func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 		if t == 0 {
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorIntegerDivideByZero, nil)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero, nil)
 		}
 		result = result % t
 	}
