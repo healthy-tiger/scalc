@@ -6,6 +6,7 @@ import (
 
 // Namespace シンボルと値のマップ
 type Namespace struct {
+	symtbl   *parser.SymbolTable
 	root     *Namespace
 	parent   *Namespace
 	bindings map[parser.SymbolID]interface{} // string, int64, float64, bool, *Function, Extensionのいれずれか
@@ -52,7 +53,14 @@ func NewNamespace(parent *Namespace) *Namespace {
 			p = p.parent
 		}
 	}
-	return &Namespace{p, parent, make(map[parser.SymbolID]interface{})}
+	return &Namespace{nil, p, parent, make(map[parser.SymbolID]interface{})}
+}
+
+// NewRootNamespace 新しく最上位の名前空間を作る
+func NewRootNamespace(st *parser.SymbolTable) *Namespace {
+	r := NewNamespace(nil)
+	r.symtbl = st
+	return r
 }
 
 // Callable 呼び出し可能なオブジェクトの呼び出し用
@@ -103,7 +111,11 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 	if sid, ok := st.SymbolValue(); ok {
 		sv, ok := ns.Get(sid)
 		if !ok {
-			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol, nil)
+			sn, err := ns.Root().symtbl.GetSymbolName(sid)
+			if err != nil {
+				panic(err)
+			}
+			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol, sn)
 		}
 		switch ev := sv.(type) {
 		case int64, float64, string, bool, Callable:
@@ -148,9 +160,9 @@ func RegisterExtension(st *parser.SymbolTable, ns *Namespace, symbolName string,
 }
 
 // DefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
-func DefaultNamespace(st *parser.SymbolTable, ns *Namespace) {
-	RegisterBoolType(st, ns)
-	RegisterOperators(st, ns)
-	RegisterMath(st, ns)
-	RegisterStmt(st, ns)
+func DefaultNamespace(ns *Namespace) {
+	RegisterBoolType(ns.Root().symtbl, ns)
+	RegisterOperators(ns.Root().symtbl, ns)
+	RegisterMath(ns.Root().symtbl, ns)
+	RegisterStmt(ns.Root().symtbl, ns)
 }

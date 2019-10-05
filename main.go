@@ -40,8 +40,8 @@ func main() {
 	flag.Parse()
 
 	st := parser.NewSymbolTable()
-	ns := runtime.NewNamespace(nil)
-	runtime.DefaultNamespace(st, ns)
+	ns := runtime.NewRootNamespace(st)
+	runtime.DefaultNamespace(ns)
 
 	args := flag.Args()
 	if len(args) == 0 {

@@ -21,7 +21,7 @@ var errorMessages map[int]string = make(map[int]string)
 
 func init() {
 	ErrorTheNumberOfArgumentsDoesNotMatch = RegisterEvalError("The number of arguments does not match")
-	ErrorUndefinedSymbol = RegisterEvalError("Undefined symbol")
+	ErrorUndefinedSymbol = RegisterEvalError("Undefined symbol \"%v\"")
 	ErrorAnEmptyListIsNotAllowed = RegisterEvalError("An empty list is not allowed")
 	ErrorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject = RegisterEvalError("The first element of the list to be evaluated must be a callable object: \"%v\" ")
 	ErrorFunctionCannotBePassedAsFunctionArgument = RegisterEvalError("Function cannot be passed as function argument")
