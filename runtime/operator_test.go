@@ -2,7 +2,6 @@ package runtime_test
 
 import (
 	"fmt"
-	"math"
 	"strconv"
 	"testing"
 
@@ -71,16 +70,16 @@ var multests []optest = []optest{
 }
 
 var divtests []optest = []optest{
-	{`(/ 1 2 3)`, false, false, int64(1) / int64(2) / int64(3)},
+	{`(/ 1 2 3)`, false, false, float64(int64(1)) / float64(int64(2)) / float64(int64(3))},
 	{`(/ 1 0)`, false, true, nil},
-	{`(/ 1 2 (/ 10 20) 3)`, false, true, nil},
-	{`(/ 1 2 (/ -10 -20) 3)`, false, true, nil},
+	{`(/ 1 2 (/ 10 20) 3)`, false, false, float64(int64(1)) / float64(int64(2)) / (float64(int64(10)) / float64(int64(20))) / float64(int64(3))},
+	{`(/ 1 2 (/ -10 -20) 3)`, false, false, float64(int64(1)) / float64(int64(2)) / (float64(int64(-10)) / float64(int64(-20))) / float64(int64(3))},
 	{`(/ 1.0 2.0 3.0)`, false, false, float64(1.0) / float64(2.0) / float64(3.0)},
-	{`(/ 1 2 (/ 10.0 20) 3)`, false, false, float64(int64(1)/int64(2)) / (float64(10.0) / float64(20.0)) / float64(int64(3))},
-	{`(/ 1 2 (/ -10.0 -20.0) 3)`, false, false, float64(int64(1)/int64(2)) / (float64(-10.0) / float64(-20.0)) / float64(int64(3))},
+	{`(/ 1 2 (/ 10.0 20) 3)`, false, false, float64(float64(int64(1))/float64(int64(2))) / (float64(10.0) / float64(20.0)) / float64(int64(3))},
+	{`(/ 1 2 (/ -10.0 -20.0) 3)`, false, false, float64(float64(int64(1))/float64(int64(2))) / (float64(-10.0) / float64(-20.0)) / float64(int64(3))},
 	{`(/ 1.0 2 3)`, false, false, (float64(1.0) / float64(int64(2))) / float64(int64(3))},
 	{`(/ 1 2.1 3.0)`, false, false, float64(int64(1)) / float64(2.1) / float64(3.0)},
-	{`(/ 1 0.0)`, false, false, math.Inf(1)},
+	{`(/ 1 0.0)`, false, true, nil},
 	{`(/ true 1)`, false, true, nil},
 	{`(/ 1 false)`, false, true, nil},
 	{`(/ true false)`, false, true, nil},
@@ -89,19 +88,19 @@ var divtests []optest = []optest{
 }
 
 var remtests []optest = []optest{
-	{`(% 1 2)`, false, false, int64(1)},
-	{`(% 1 0)`, false, true, nil},
-	{`(% 1 2 3)`, false, true, nil},
-	{`(% 1.0 2)`, false, true, nil},
-	{`(% 1 2.0)`, false, true, nil},
-	{`(% "1" 2)`, false, true, nil},
-	{`(% 1 "2")`, false, true, nil},
-	{`(% true 1)`, false, true, nil},
-	{`(% 1 false)`, false, true, nil},
-	{`(% true false)`, false, true, nil},
-	{`(% true "true")`, false, true, nil},
-	{`(% 1)`, false, true, nil},
-	{`(%)`, false, true, nil},
+	{`(rem 1 2)`, false, false, int64(1)},
+	{`(rem 1 0)`, false, true, nil},
+	{`(rem 1 2 3)`, false, false, (int64(1) % int64(2)) % int64(3)},
+	{`(rem 1.0 2)`, false, false, int64(float64(1.0)) % int64(2)},
+	{`(rem 1 2.0)`, false, false, int64(1) % int64(float64(2.0))},
+	{`(rem "1" 2)`, false, true, nil},
+	{`(rem 1 "2")`, false, true, nil},
+	{`(rem true 1)`, false, true, nil},
+	{`(rem 1 false)`, false, true, nil},
+	{`(rem true false)`, false, true, nil},
+	{`(rem true "true")`, false, true, nil},
+	{`(rem 1)`, false, true, nil},
+	{`(rem)`, false, true, nil},
 }
 
 var eqtests []optest = []optest{

@@ -214,8 +214,14 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	for i := 2; i < lst.Len(); i++ {
 		switch rv := params[i].(type) {
 		case int64:
+			if rv == 0 {
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero, nil)
+			}
 			result = result / float64(rv)
 		case float64:
+			if rv == 0.0 {
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero, nil)
+			}
 			result = result / rv
 		default:
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
