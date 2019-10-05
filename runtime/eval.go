@@ -48,7 +48,7 @@ func NewNamespace(parent *Namespace) *Namespace {
 	// 最上位の名前空間を探しておく
 	var p *Namespace = nil
 	if parent != nil {
-		p := parent
+		p = parent
 		for p.parent != nil {
 			p = p.parent
 		}
