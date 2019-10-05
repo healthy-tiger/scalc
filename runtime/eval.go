@@ -36,6 +36,9 @@ func (ns *Namespace) Parent() *Namespace {
 
 // Root nsの最上位の名前空間を返す。
 func (ns *Namespace) Root() *Namespace {
+	if ns.parent == nil { // 親の名前空間がない＝自分自身が最上位
+		return ns
+	}
 	return ns.root
 }
 
