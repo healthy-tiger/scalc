@@ -124,10 +124,9 @@ func ParseString(filename string, st *SymbolTable, src string) ([]*List, error) 
 func (p Position) String() string {
 	var b bytes.Buffer
 	b.WriteString(p.Filename)
-	b.WriteString("[")
+	b.WriteString(":")
 	b.WriteString(strconv.FormatInt(int64(p.Line), 10))
 	b.WriteString(":")
 	b.WriteString(strconv.FormatInt(int64(p.Column), 10))
-	b.WriteString("]")
 	return b.String()
 }
