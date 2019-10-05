@@ -43,19 +43,24 @@ func main() {
 	ns := runtime.NewNamespace(nil)
 	runtime.DefaultNamespace(st, ns)
 
-	for _, v := range flag.Args() {
-		f, err := os.Open(v)
-		if err != nil {
-			fmt.Println(err)
-		}
-		lst, err := parser.Parse(v, st, f)
-		if err != nil {
-			fmt.Println(err)
-		}
-		for _, l := range lst {
-			_, err := runtime.EvalList(l, ns)
+	args := flag.Args()
+	if len(args) == 0 {
+		interactive = true
+	} else {
+		for _, v := range flag.Args() {
+			f, err := os.Open(v)
 			if err != nil {
 				fmt.Println(err)
+			}
+			lst, err := parser.Parse(v, st, f)
+			if err != nil {
+				fmt.Println(err)
+			}
+			for _, l := range lst {
+				_, err := runtime.EvalList(l, ns)
+				if err != nil {
+					fmt.Println(err)
+				}
 			}
 		}
 	}
