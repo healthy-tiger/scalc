@@ -41,7 +41,7 @@ func main() {
 
 	st := parser.NewSymbolTable()
 	ns := runtime.NewRootNamespace(st)
-	runtime.DefaultNamespace(ns)
+	runtime.MakeDefaultNamespace(ns)
 
 	args := flag.Args()
 	if len(args) == 0 {

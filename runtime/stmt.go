@@ -163,11 +163,11 @@ func funcBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 }
 
 // RegisterStmt 文に関する拡張関数を登録する。
-func RegisterStmt(st *parser.SymbolTable, ns *Namespace) {
-	RegisterExtension(st, ns, setSymbol, nil, setBody)
-	RegisterExtension(st, ns, ifSymbol, nil, ifBody)
-	RegisterExtension(st, ns, printSymbol, nil, printBody)
-	RegisterExtension(st, ns, whileSymbol, nil, whileBody)
-	RegisterExtension(st, ns, beginSymbol, nil, beginBody)
-	RegisterExtension(st, ns, funcSymbol, nil, funcBody)
+func RegisterStmt(ns *Namespace) {
+	ns.RegisterExtension(setSymbol, nil, setBody)
+	ns.RegisterExtension(ifSymbol, nil, ifBody)
+	ns.RegisterExtension(printSymbol, nil, printBody)
+	ns.RegisterExtension(whileSymbol, nil, whileBody)
+	ns.RegisterExtension(beginSymbol, nil, beginBody)
+	ns.RegisterExtension(funcSymbol, nil, funcBody)
 }

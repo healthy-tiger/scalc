@@ -100,7 +100,7 @@ func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 }
 
 // RegisterMath stに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
-func RegisterMath(st *parser.SymbolTable, ns *Namespace) {
-	RegisterExtension(st, ns, idivSYmbol, nil, idivBody)
-	RegisterExtension(st, ns, remSymbol, nil, remBody)
+func RegisterMath(ns *Namespace) {
+	ns.RegisterExtension(idivSYmbol, nil, idivBody)
+	ns.RegisterExtension(remSymbol, nil, remBody)
 }

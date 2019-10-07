@@ -126,7 +126,7 @@ func doOpTests(name string, t *testing.T, tests []optest) {
 			}
 		} else {
 			ns := runtime.NewRootNamespace(st)
-			runtime.DefaultNamespace(ns)
+			runtime.MakeDefaultNamespace(ns)
 			result, err := runtime.EvalList(lists[0], ns)
 			if err != nil {
 				if !tst.evalError {

@@ -4,65 +4,6 @@ import (
 	"github.com/healthy-tiger/scalc/parser"
 )
 
-// Namespace シンボルと値のマップ
-type Namespace struct {
-	symtbl   *parser.SymbolTable
-	root     *Namespace
-	parent   *Namespace
-	bindings map[parser.SymbolID]interface{} // string, int64, float64, bool, *Function, Extensionのいれずれか
-}
-
-// Get nsからシンボルID idに対応する値を取得する。
-func (ns *Namespace) Get(id parser.SymbolID) (interface{}, bool) {
-	n := ns
-	for n != nil {
-		v, ok := n.bindings[id]
-		if ok {
-			return v, true
-		}
-		n = n.parent
-	}
-	return nil, false
-}
-
-// Set nsにシンボルID idに対応する値を格納する。
-func (ns *Namespace) Set(id parser.SymbolID, value interface{}) {
-	ns.bindings[id] = value
-}
-
-// Parent nsの親の名前空間を返す。
-func (ns *Namespace) Parent() *Namespace {
-	return ns.parent
-}
-
-// Root nsの最上位の名前空間を返す。
-func (ns *Namespace) Root() *Namespace {
-	if ns.parent == nil { // 親の名前空間がない＝自分自身が最上位
-		return ns
-	}
-	return ns.root
-}
-
-// NewNamespace 新しい名前空間を生成する。
-func NewNamespace(parent *Namespace) *Namespace {
-	// 最上位の名前空間を探しておく
-	var p *Namespace = nil
-	if parent != nil {
-		p = parent
-		for p.parent != nil {
-			p = p.parent
-		}
-	}
-	return &Namespace{nil, p, parent, make(map[parser.SymbolID]interface{})}
-}
-
-// NewRootNamespace 新しく最上位の名前空間を作る
-func NewRootNamespace(st *parser.SymbolTable) *Namespace {
-	r := NewNamespace(nil)
-	r.symtbl = st
-	return r
-}
-
 // Callable 呼び出し可能なオブジェクトの呼び出し用
 type Callable interface {
 	Eval(lst *parser.List, ns *Namespace) (interface{}, error)
@@ -111,7 +52,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 	if sid, ok := st.SymbolValue(); ok {
 		sv, ok := ns.Get(sid)
 		if !ok {
-			sn, err := ns.Root().symtbl.GetSymbolName(sid)
+			sn, err := ns.GetSymbolName(sid)
 			if err != nil {
 				panic(err)
 			}
@@ -152,17 +93,10 @@ func EvalList(lst *parser.List, ns *Namespace) (interface{}, error) {
 	return nil, newEvalError(first.Position(), ErrorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject, callable)
 }
 
-// RegisterExtension 拡張関数を登録する。
-func RegisterExtension(st *parser.SymbolTable, ns *Namespace, symbolName string, extobj interface{}, extbody func(interface{}, *parser.List, *Namespace) (interface{}, error)) parser.SymbolID {
-	sid := st.GetSymbolID(symbolName)
-	ns.Set(sid, &Extension{extobj, extbody})
-	return sid
-}
-
-// DefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
-func DefaultNamespace(ns *Namespace) {
-	RegisterBoolType(ns.Root().symtbl, ns)
-	RegisterOperators(ns.Root().symtbl, ns)
-	RegisterMath(ns.Root().symtbl, ns)
-	RegisterStmt(ns.Root().symtbl, ns)
+// MakeDefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。
+func MakeDefaultNamespace(ns *Namespace) {
+	RegisterBoolType(ns)
+	RegisterOperators(ns)
+	RegisterMath(ns)
+	RegisterStmt(ns)
 }
