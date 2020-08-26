@@ -127,5 +127,5 @@ func MakeDefaultNamespace(ns *Namespace) {
 	RegisterOperators(ns)
 	RegisterMath(ns)
 	RegisterStmt(ns)
-	RegisterTImeFunc(ns)
+	RegisterTimeFunc(ns)
 }

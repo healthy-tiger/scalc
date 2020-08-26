@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
@@ -14,22 +13,14 @@ func main() {
 	ns := runtime.NewRootNamespace(st)
 	runtime.MakeDefaultNamespace(ns)
 
-	flag.Parse()
-
-	for _, v := range flag.Args() {
-		f, err := os.Open(v)
+	lst, err := parser.Parse("stdin", st, os.Stdin)
+	if err != nil {
+		fmt.Println(err)
+	}
+	for _, l := range lst {
+		_, err := runtime.EvalList(l, ns)
 		if err != nil {
 			fmt.Println(err)
-		}
-		lst, err := parser.Parse(v, st, f)
-		if err != nil {
-			fmt.Println(err)
-		}
-		for _, l := range lst {
-			_, err := runtime.EvalList(l, ns)
-			if err != nil {
-				fmt.Println(err)
-			}
 		}
 	}
 }
