@@ -37,12 +37,12 @@ func init() {
 func setBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	sid, ok := lst.SymbolAt(1)
 	if !ok {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorYouCannotBindAValueToAnythingOtherThanASymbol, nil)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorYouCannotBindAValueToAnythingOtherThanASymbol)
 	}
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorYouMustSpecifyTheValueToBind, nil)
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorYouMustSpecifyTheValueToBind)
 	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.ElementAt(3).Position(), ErrorYouCannotBindMoreThanOneValueToASymbol, nil)
+		return nil, newEvalError(lst.ElementAt(3).Position(), ErrorYouCannotBindMoreThanOneValueToASymbol)
 	}
 	v, err := EvalElement(lst.ElementAt(2), ns)
 	if err != nil {
@@ -53,10 +53,8 @@ func setBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 }
 
 func ifBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 4 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
-	} else if lst.Len() > 4 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
+	if lst.Len() != 4 {
+		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 4-1)
 	}
 	p, err := EvalElement(lst.ElementAt(1), ns)
 	if err != nil {
@@ -71,39 +69,25 @@ func ifBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeBoolean, p)
 }
 
-func evalAsBool(elm parser.SyntaxElement, ns *Namespace) (bool, error) {
-	r, err := EvalElement(elm, ns)
-	if err != nil {
-		return false, err
-	}
-	c, ok := r.(bool)
-	if ok {
-		return c, nil
-	}
-	return false, newEvalError(elm.Position(), ErrorOperantsMustBeBoolean, r)
-}
-
 func whileBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
-	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
+	if lst.Len() != 3 {
+		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 3-1)
 	}
-
 	condelm := lst.ElementAt(1)
 	bodyelm := lst.ElementAt(2)
-	cond, err := evalAsBool(condelm, ns)
-	var result interface{} = nil
+	cond, err := EvalAsBool(condelm, ns)
+	count := int64(0)
 	for err == nil && cond {
-		result, err = EvalElement(bodyelm, ns)
+		count++
+		_, err = EvalElement(bodyelm, ns)
 		if err == nil { // bodyelmを評価してエラーがなければ再度、ループの条件を確認する。
-			cond, err = evalAsBool(condelm, ns)
+			cond, err = EvalAsBool(condelm, ns)
 		}
 	}
 	if err != nil { // エラーで抜けた場合はEvalError
 		return nil, err
 	}
-	return result, nil
+	return count, nil // bodyelmを評価した回数を返す。
 }
 
 // printBody fmt.Printlnを呼び出して結果をそのまま返す。
@@ -121,7 +105,7 @@ func printBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func beginBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 2 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments)
 	}
 	var result interface{} = nil
 	var err error = nil
@@ -135,19 +119,16 @@ func beginBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 }
 
 func funcBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
-	} else if lst.Len() > 3 {
-		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, nil)
+	if lst.Len() != 3 {
+		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 3-1)
 	}
-
 	e1 := lst.ElementAt(1)
 	if !e1.IsList() {
-		return nil, newEvalError(e1.Position(), ErrorAFunctionDefinitionRequiresAnArgumentList, nil)
+		return nil, newEvalError(e1.Position(), ErrorAFunctionDefinitionRequiresAnArgumentList)
 	}
 	body := lst.ElementAt(2)
 	if !body.IsList() {
-		return nil, newEvalError(body.Position(), ErrorAFunctionDefinitionRequiresAFunctionBodyDefinition, nil)
+		return nil, newEvalError(body.Position(), ErrorAFunctionDefinitionRequiresAFunctionBodyDefinition)
 	}
 	// e1の中身が全てシンボルであることをチェックする。
 	argdefs := e1.(*parser.List)
@@ -155,7 +136,7 @@ func funcBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 	for i := 0; i < argdefs.Len(); i++ {
 		s, ok := argdefs.SymbolAt(i)
 		if !ok {
-			return nil, newEvalError(argdefs.ElementAt(i).Position(), ErrorTheArgumentListMustConsistOfSymbolsOnly, nil)
+			return nil, newEvalError(argdefs.ElementAt(i).Position(), ErrorTheArgumentListMustConsistOfSymbolsOnly)
 		}
 		args[i] = s
 	}

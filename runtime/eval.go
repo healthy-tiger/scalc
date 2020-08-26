@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"time"
+
 	"github.com/healthy-tiger/scalc/parser"
 )
 
@@ -18,7 +20,7 @@ type Function struct {
 // Eval 関数fを引数agrsと、グローバルの名前空間globalsで評価し、その結果を返す。
 func (f *Function) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 	if len(f.params) != lst.Len()-1 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, nil)
+		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, len(f.params), lst.Len()-1)
 	}
 	// 呼び出し先（の関数を実行する際）の名前空間を定義。最上位の名前空間以外は呼び出し元と名前空間を共有しない。
 	lns := NewNamespace(ns.Root())
@@ -31,6 +33,32 @@ func (f *Function) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 		lns.Set(f.params[i-1], a)
 	}
 	return EvalList(f.body, lns)
+}
+
+// EvalAsBool 名前空間nsでelmを評価し、その結果をboolとして返す。boolでない結果の場合はエラーを返す。
+func EvalAsBool(elm parser.SyntaxElement, ns *Namespace) (bool, error) {
+	r, err := EvalElement(elm, ns)
+	if err != nil {
+		return false, err
+	}
+	c, ok := r.(bool)
+	if ok {
+		return c, nil
+	}
+	return false, newEvalError(elm.Position(), ErrorOperantsMustBeBoolean, r)
+}
+
+// EvalAsInt 名前空間nsでelmを評価し、その結果をint64として返す。int64でない結果の場合はエラーを返す。
+func EvalAsInt(elm parser.SyntaxElement, ns *Namespace) (int64, error) {
+	r, err := EvalElement(elm, ns)
+	if err != nil {
+		return -1, err
+	}
+	c, ok := r.(int64)
+	if ok {
+		return c, nil
+	}
+	return -1, newEvalError(elm.Position(), ErrorOperantsMustBeOfIntegerType, r)
 }
 
 // Extension scalcの拡張関数の構造体
@@ -59,7 +87,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol, sn)
 		}
 		switch ev := sv.(type) {
-		case int64, float64, string, bool, Callable:
+		case int64, float64, string, bool, Callable, time.Time:
 			return ev, nil
 		default:
 			panic("Unexpected evaluation result type")
@@ -79,7 +107,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 func EvalList(lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 空のリストは評価できないのでエラー(Excentionがリストを評価する場合はExtentionsによる）
 	if lst.Len() == 0 {
-		return nil, newEvalError(lst.Position(), ErrorAnEmptyListIsNotAllowed, nil)
+		return nil, newEvalError(lst.Position(), ErrorAnEmptyListIsNotAllowed)
 	}
 	// 最初の要素は必ずシンボルで、呼び出し可能なオブジェクト（*FunctionかExtensionにバインドされていなければならない）
 	first := lst.ElementAt(0)
@@ -99,4 +127,5 @@ func MakeDefaultNamespace(ns *Namespace) {
 	RegisterOperators(ns)
 	RegisterMath(ns)
 	RegisterStmt(ns)
+	RegisterTImeFunc(ns)
 }

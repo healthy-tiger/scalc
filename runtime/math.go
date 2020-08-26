@@ -14,7 +14,7 @@ const (
 // idivBody 引数をすべて整数型に変換してから除算を行う。
 func idivBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len(), 3)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -48,7 +48,7 @@ func idivBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 		if t == 0 {
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero, nil)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero)
 		}
 		result = result / t
 	}
@@ -58,7 +58,7 @@ func idivBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 // remBody 引数をすべて整数型に変換してから剰余を求める。
 func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, nil)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len(), 3)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -92,7 +92,7 @@ func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeNumeric, params[i])
 		}
 		if t == 0 {
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero, nil)
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero)
 		}
 		result = result % t
 	}

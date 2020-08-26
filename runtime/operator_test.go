@@ -21,15 +21,15 @@ var addtests []optest = []optest{
 	{`(+ 1 2 (+ 10 20) 3)`, false, false, int64(1) + int64(2) + (int64(10) + int64(20)) + int64(3)},
 	{`(+ 1 2 (+ -10 -20) 3)`, false, false, int64(1) + int64(2) + (int64(-10) + int64(-20)) + int64(3)},
 	{`(+ 1.0 2.0 3.0)`, false, false, float64(1.0) + float64(2.0) + float64(3.0)},
-	{`(+ 1 2 (+ 10.0 20) 3)`, false, false, float64(int64(1)+int64(2)) + (float64(10.0) + float64(20.0)) + float64(int64(3))},
-	{`(+ 1 2 (+ -10.0 -20.0) 3)`, false, false, float64(int64(1)+int64(2)) + (float64(-10.0) + float64(-20.0)) + float64(int64(3))},
-	{`(+ 1.0 2 3)`, false, false, (float64(1.0) + float64(int64(2))) + float64(int64(3))},
-	{`(+ 1 2.1 3.0)`, false, false, float64(int64(1)) + float64(2.1) + float64(3.0)},
+	{`(+ 1 2 (+ 10.0 20) 3)`, false, true, nil},
+	{`(+ 1 2 (+ -10.0 -20.0) 3)`, false, true, nil},
+	{`(+ 1.0 2 3)`, false, true, nil},
+	{`(+ 1 2.1 3.0)`, false, true, nil},
 	{`(+ "abc" "123")`, false, false, "abc123"},
-	{`(+ "abc" 123)`, false, false, "abc123"},
-	{`(+ "abc" 1.0)`, false, false, "abc" + strconv.FormatFloat(1.0, 'e', -1, 64)},
-	//{`(+ 1 + "abc")`, false, false, nil}, // 算術データ型が必要な胸のエラーがでるはず
-	{`(+ "" 123)`, false, false, "123"},
+	{`(+ "abc" 123)`, false, true, nil},
+	{`(+ "abc" 1.0)`, false, true, nil},
+	{`(+ 1 + "abc")`, false, true, nil},
+	{`(+ "" 123)`, false, true, nil},
 	{`(+ true 1)`, false, true, nil},
 	{`(+ 1 false)`, false, true, nil},
 	{`(+ true false)`, false, true, nil},
@@ -42,10 +42,10 @@ var subtests []optest = []optest{
 	{`(- 1 2 (- 10 20) 3)`, false, false, int64(1) - int64(2) - (int64(10) - int64(20)) - int64(3)},
 	{`(- 1 2 (- -10 -20) 3)`, false, false, int64(1) - int64(2) - (int64(-10) - int64(-20)) - int64(3)},
 	{`(- 1.0 2.0 3.0)`, false, false, float64(1.0) - float64(2.0) - float64(3.0)},
-	{`(- 1 2 (- 10.0 20) 3)`, false, false, float64(int64(1)-int64(2)) - (float64(10.0) - float64(20.0)) - float64(int64(3))},
-	{`(- 1 2 (- -10.0 -20.0) 3)`, false, false, float64(int64(1)-int64(2)) - (float64(-10.0) - float64(-20.0)) - float64(int64(3))},
-	{`(- 1.0 2 3)`, false, false, (float64(1.0) - float64(int64(2))) - float64(int64(3))},
-	{`(- 1 2.1 3.0)`, false, false, float64(int64(1)) - float64(2.1) - float64(3.0)},
+	{`(- 1 2 (- 10.0 20) 3)`, false, true, nil},
+	{`(- 1 2 (- -10.0 -20.0) 3)`, false, true, nil},
+	{`(- 1.0 2 3)`, false, true, nil},
+	{`(- 1 2.1 3.0)`, false, true, nil},
 	{`(- true 1)`, false, true, nil},
 	{`(- 1 false)`, false, true, nil},
 	{`(- true false)`, false, true, nil},
@@ -58,10 +58,10 @@ var multests []optest = []optest{
 	{`(* 1 2 (* 10 20) 3)`, false, false, int64(1) * int64(2) * (int64(10) * int64(20)) * int64(3)},
 	{`(* 1 2 (* -10 -20) 3)`, false, false, int64(1) * int64(2) * (int64(-10) * int64(-20)) * int64(3)},
 	{`(* 1.0 2.0 3.0)`, false, false, float64(1.0) * float64(2.0) * float64(3.0)},
-	{`(* 1 2 (* 10.0 20) 3)`, false, false, float64(int64(1)*int64(2)) * (float64(10.0) * float64(20.0)) * float64(int64(3))},
-	{`(* 1 2 (* -10.0 -20.0) 3)`, false, false, float64(int64(1)*int64(2)) * (float64(-10.0) * float64(-20.0)) * float64(int64(3))},
-	{`(* 1.0 2 3)`, false, false, (float64(1.0) * float64(int64(2))) * float64(int64(3))},
-	{`(* 1 2.1 3.0)`, false, false, float64(int64(1)) * float64(2.1) * float64(3.0)},
+	{`(* 1 2 (* 10.0 20) 3)`, false, true, nil},
+	{`(* 1 2 (* -10.0 -20.0) 3)`, false, true, nil},
+	{`(* 1.0 2 3)`, false, true, nil},
+	{`(* 1 2.1 3.0)`, false, true, nil},
 	{`(* true 1)`, false, true, nil},
 	{`(* 1 false)`, false, true, nil},
 	{`(* true false)`, false, true, nil},
@@ -70,15 +70,17 @@ var multests []optest = []optest{
 }
 
 var divtests []optest = []optest{
-	{`(/ 1 2 3)`, false, false, float64(int64(1)) / float64(int64(2)) / float64(int64(3))},
+	{`(/ 1 2 3)`, false, false, int64(1) / int64(2) / int64(3)},
+	{`(/ 4 2)`, false, false, int64(4) / int64(2)},
+	{`(/ 3 2)`, false, false, int64(3) / int64(2)},
 	{`(/ 1 0)`, false, true, nil},
-	{`(/ 1 2 (/ 10 20) 3)`, false, false, float64(int64(1)) / float64(int64(2)) / (float64(int64(10)) / float64(int64(20))) / float64(int64(3))},
-	{`(/ 1 2 (/ -10 -20) 3)`, false, false, float64(int64(1)) / float64(int64(2)) / (float64(int64(-10)) / float64(int64(-20))) / float64(int64(3))},
+	{`(/ 1 2 (/ 10 20) 3)`, false, true, nil},
+	{`(/ 1 2 (/ -10 -20) 3)`, false, true, nil},
 	{`(/ 1.0 2.0 3.0)`, false, false, float64(1.0) / float64(2.0) / float64(3.0)},
-	{`(/ 1 2 (/ 10.0 20) 3)`, false, false, float64(float64(int64(1))/float64(int64(2))) / (float64(10.0) / float64(20.0)) / float64(int64(3))},
-	{`(/ 1 2 (/ -10.0 -20.0) 3)`, false, false, float64(float64(int64(1))/float64(int64(2))) / (float64(-10.0) / float64(-20.0)) / float64(int64(3))},
-	{`(/ 1.0 2 3)`, false, false, (float64(1.0) / float64(int64(2))) / float64(int64(3))},
-	{`(/ 1 2.1 3.0)`, false, false, float64(int64(1)) / float64(2.1) / float64(3.0)},
+	{`(/ 1 2 (/ 10.0 20) 3)`, false, true, nil},
+	{`(/ 1 2 (/ -10.0 -20.0) 3)`, false, true, nil},
+	{`(/ 1.0 2 3)`, false, true, nil},
+	{`(/ 1 2.1 3.0)`, false, true, nil},
 	{`(/ 1 0.0)`, false, true, nil},
 	{`(/ true 1)`, false, true, nil},
 	{`(/ 1 false)`, false, true, nil},
@@ -114,6 +116,97 @@ var eqtests []optest = []optest{
 	{`(eq 1 "1")`, false, false, false},
 	{`(eq 1 true)`, false, false, false},
 	{`(eq 1)`, false, true, false},
+}
+
+var lttests []optest = []optest{
+	{`(< 1 2)`, false, false, true},
+	{`(< 2 1)`, false, false, false},
+	{`(< 2 2)`, false, false, false},
+	{`(< 1.0 2.0)`, false, false, true},
+	{`(< 2.0 1.0)`, false, false, false},
+	{`(< 2.0 2.0)`, false, false, false},
+	{`(< 1 2.0)`, false, true, nil},
+	{`(< 2 1.0)`, false, true, nil},
+	{`(< 2 2.0)`, false, true, nil},
+	{`(< 1.0 2)`, false, true, nil},
+	{`(< 2.0 1)`, false, true, nil},
+	{`(< 2.0 2)`, false, true, nil},
+	{`(< 1 2 3)`, false, true, nil},
+}
+
+var ltetests []optest = []optest{
+	{`(<= 1 2)`, false, false, true},
+	{`(<= 2 1)`, false, false, false},
+	{`(<= 2 2)`, false, false, true},
+	{`(<= 1.0 2.0)`, false, false, true},
+	{`(<= 2.0 1.0)`, false, false, false},
+	{`(<= 2.0 2.0)`, false, false, true},
+	{`(<= 1 2.0)`, false, true, nil},
+	{`(<= 2 1.0)`, false, true, nil},
+	{`(<= 2 2.0)`, false, true, nil},
+	{`(<= 1.0 2)`, false, true, nil},
+	{`(<= 2.0 1)`, false, true, nil},
+	{`(<= 2.0 2)`, false, true, nil},
+	{`(<= 1 2 3)`, false, true, nil},
+}
+
+var gttests []optest = []optest{
+	{`(> 1 2)`, false, false, false},
+	{`(> 2 1)`, false, false, true},
+	{`(> 2 2)`, false, false, false},
+	{`(> 1.0 2.0)`, false, false, false},
+	{`(> 2.0 1.0)`, false, false, true},
+	{`(> 2.0 2.0)`, false, false, false},
+	{`(> 1 2.0)`, false, true, nil},
+	{`(> 2 1.0)`, false, true, nil},
+	{`(> 2 2.0)`, false, true, nil},
+	{`(> 1.0 2)`, false, true, nil},
+	{`(> 2.0 1)`, false, true, nil},
+	{`(> 2.0 2)`, false, true, nil},
+	{`(> 1 2 3)`, false, true, nil},
+}
+
+var gtetests []optest = []optest{
+	{`(>= 1 2)`, false, false, false},
+	{`(>= 2 1)`, false, false, true},
+	{`(>= 2 2)`, false, false, true},
+	{`(>= 1.0 2.0)`, false, false, false},
+	{`(>= 2.0 1.0)`, false, false, true},
+	{`(>= 2.0 2.0)`, false, false, true},
+	{`(>= 1 2.0)`, false, true, nil},
+	{`(>= 2 1.0)`, false, true, nil},
+	{`(>= 2 2.0)`, false, true, nil},
+	{`(>= 1.0 2)`, false, true, nil},
+	{`(>= 2.0 1)`, false, true, nil},
+	{`(>= 2.0 2)`, false, true, nil},
+	{`(>= 1 2 3)`, false, true, nil},
+}
+
+var strtests = []optest{
+	{`(str 1)`, false, false, strconv.FormatInt(1, 10)},
+	{`(str -10)`, false, false, strconv.FormatInt(-10, 10)},
+	{`(str 1.0)`, false, false, strconv.FormatFloat(float64(1.0), 'e', -1, 64)},
+	{`(str 3.1415926535)`, false, false, strconv.FormatFloat(float64(3.1415926535), 'e', -1, 64)},
+	{`(str true)`, false, false, strconv.FormatBool(true)},
+	{`(str false)`, false, false, strconv.FormatBool(false)},
+}
+
+var inttests = []optest{
+	{`(int 10)`, false, false, int64(10)},
+	{`(int 10.0)`, false, false, int64(10.0)},
+	{`(int "10")`, false, false, int64(10)},
+	{`(int "10.0")`, false, true, nil},
+	{`(int true)`, false, false, int64(1)},
+	{`(int false)`, false, false, int64(0)},
+}
+
+var floattests = []optest{
+	{`(float 10)`, false, false, float64(int64(10))},
+	{`(float 10.0)`, false, false, float64(10.0)},
+	{`(float "10")`, false, false, float64(10)},
+	{`(float "10.0")`, false, false, float64(10)},
+	{`(float true)`, false, true, nil},
+	{`(float false)`, false, true, nil},
 }
 
 func doOpTests(name string, t *testing.T, tests []optest) {
@@ -181,4 +274,32 @@ func TestRem(t *testing.T) {
 
 func TestEq(t *testing.T) {
 	doOpTests("TestEq", t, eqtests)
+}
+
+func TestGt(t *testing.T) {
+	doOpTests("TestGt", t, gttests)
+}
+
+func TestGte(t *testing.T) {
+	doOpTests("TestGte", t, gtetests)
+}
+
+func TestLt(t *testing.T) {
+	doOpTests("TestLt", t, lttests)
+}
+
+func TestLte(t *testing.T) {
+	doOpTests("TestLte", t, ltetests)
+}
+
+func TestStr(t *testing.T) {
+	doOpTests("TestStr", t, strtests)
+}
+
+func TestInt(t *testing.T) {
+	doOpTests("TestInt", t, inttests)
+}
+
+func TestFloat(t *testing.T) {
+	doOpTests("TestFloat", t, floattests)
 }
