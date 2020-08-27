@@ -242,19 +242,59 @@ func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 	if lst.Len() < 3 {
 		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len()-1, 2)
 	}
-	l, err := EvalElement(lst.ElementAt(1), ns)
-	if err != nil {
-		return nil, err
-	}
-	for i := 2; i < lst.Len(); i++ {
-		r, err := EvalElement(lst.ElementAt(i), ns)
+	// 引数をすべて評価する。
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
 		if err != nil {
 			return nil, err
-		} else if l != r {
-			return false, nil
 		}
+		params[i] = ev
 	}
-	return true, nil
+
+	// 引数を最初の引数の型に合わせながらすべて加算する。
+	fst := params[1]
+	switch v := fst.(type) {
+	case int64:
+		for i := 2; i < lst.Len(); i++ {
+			if iv, ok := params[i].(int64); ok {
+				if v != iv {
+					return false, nil
+				}
+			} else {
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
+			}
+		}
+		return true, nil
+	case float64:
+		for i := 2; i < lst.Len(); i++ {
+			if fv, ok := params[i].(float64); ok {
+				if v != fv {
+					return false, nil
+				}
+			} else {
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
+			}
+		}
+		return true, nil
+	case time.Time:
+		if lst.Len() != 3 {
+			return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		}
+		for i := 2; i < lst.Len(); i++ {
+			if tv, ok := params[i].(time.Time); ok {
+				if !v.Equal(tv) {
+					return false, nil
+				}
+			} else {
+				return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, params[1], params[2])
+			}
+		}
+		return true, nil
+	default:
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, fst)
+	}
+
 }
 
 func bitwiseANDbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -426,6 +466,11 @@ func ltBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 			return a < b, nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+	case time.Time:
+		if b, ok := pb.(time.Time); ok {
+			return a.Before(b), nil
+		}
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, pa)
 	}
@@ -454,6 +499,11 @@ func lteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	case float64:
 		if b, ok := pb.(float64); ok {
 			return a <= b, nil
+		}
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+	case time.Time:
+		if b, ok := pb.(time.Time); ok {
+			return a.Before(b) || a.Equal(b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
@@ -486,6 +536,11 @@ func gtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 			return a > b, nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+	case time.Time:
+		if b, ok := pb.(time.Time); ok {
+			return a.After(b), nil
+		}
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, pa)
 	}
@@ -514,6 +569,11 @@ func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	case float64:
 		if b, ok := pb.(float64); ok {
 			return a >= b, nil
+		}
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+	case time.Time:
+		if b, ok := pb.(time.Time); ok {
+			return a.After(b) || a.Equal(b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
