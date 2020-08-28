@@ -41,12 +41,12 @@ var (
 )
 
 func init() {
-	ErrorTypeMissmatch = RegisterEvalError("Type missmatch (\"%v\", \"%v\")")
-	ErrorOperantsMustBeNumeric = RegisterEvalError("Operants must be numeric: \"%v\"")
-	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type: \"%v\"")
+	ErrorTypeMissmatch = RegisterEvalError("Type missmatch (%v, %v)")
+	ErrorOperantsMustBeNumeric = RegisterEvalError("Operants must be numeric: %v")
+	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type: %v")
 	ErrorDivisionByZero = RegisterEvalError("Division by zero")
 	ErrorAllOperantsMustBeOfTheSameType = RegisterEvalError("All operants must be of the same type")
-	ErrorNonArithmeticDataType = RegisterEvalError("Non-arithmetic data type: '\"%v\")")
+	ErrorNonArithmeticDataType = RegisterEvalError("Non-arithmetic data type: '%v)")
 }
 
 // Eval オペラントの評価結果がすべてint64、すべてfloat64の場合にそれらのすべてを加算（または連結）した結果を返す。
