@@ -38,7 +38,6 @@ var (
 	ErrorOperantsMustBeOfIntegerType    int
 	ErrorDivisionByZero                 int
 	ErrorAllOperantsMustBeOfTheSameType int
-	ErrorOperantsMustBeBoolean          int
 	ErrorNonArithmeticDataType          int
 )
 
@@ -48,13 +47,8 @@ func init() {
 	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type: \"%v\"")
 	ErrorDivisionByZero = RegisterEvalError("Division by zero")
 	ErrorAllOperantsMustBeOfTheSameType = RegisterEvalError("All operants must be of the same type")
-	ErrorOperantsMustBeBoolean = RegisterEvalError("Operants must be boolen: \"%v\"")
 	ErrorNonArithmeticDataType = RegisterEvalError("Non-arithmetic data type: '\"%v\")")
 }
-
-// func (t Time) After(u Time) bool
-// func (t Time) Before(u Time) bool
-// func (t Time) Equal(u Time) bool
 
 // Eval オペラントの評価結果がすべてint64、すべてfloat64の場合にそれらのすべてを加算（または連結）した結果を返す。
 func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -259,24 +253,35 @@ func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		for i := 2; i < lst.Len(); i++ {
 			if iv, ok := params[i].(int64); ok {
 				if v != iv {
-					return false, nil
+					return int64(0), nil
 				}
 			} else {
 				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
 			}
 		}
-		return true, nil
+		return int64(1), nil
 	case float64:
 		for i := 2; i < lst.Len(); i++ {
 			if fv, ok := params[i].(float64); ok {
 				if v != fv {
-					return false, nil
+					return int64(0), nil
 				}
 			} else {
 				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
 			}
 		}
-		return true, nil
+		return int64(1), nil
+	case string:
+		for i := 2; i < lst.Len(); i++ {
+			if sv, ok := params[i].(string); ok {
+				if v != sv {
+					return int64(0), nil
+				}
+			} else {
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
+			}
+		}
+		return int64(1), nil
 	case time.Time:
 		if lst.Len() != 3 {
 			return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
@@ -284,13 +289,13 @@ func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		for i := 2; i < lst.Len(); i++ {
 			if tv, ok := params[i].(time.Time); ok {
 				if !v.Equal(tv) {
-					return false, nil
+					return int64(0), nil
 				}
 			} else {
 				return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, params[1], params[2])
 			}
 		}
-		return true, nil
+		return int64(1), nil
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, fst)
 	}
@@ -590,10 +595,13 @@ func notBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	if b, ok := p.(bool); ok {
-		return !b, nil
+	if b, ok := p.(int64); ok {
+		if b != 0 {
+			return 0, nil
+		}
+		return 1, nil
 	}
-	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeBoolean, p)
+	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, p)
 }
 
 func andBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -606,16 +614,16 @@ func andBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		if err != nil {
 			return nil, err
 		}
-		bv, ok := ev.(bool)
+		bv, ok := ev.(int64)
 		if !ok {
-			// 評価結果がboolに変換できない場合はエラーになる。
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeBoolean, ev)
+			// 評価結果がint64に変換できない場合はエラーになる。
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeOfIntegerType, ev)
 		}
-		if !bv {
-			return false, nil
+		if bv == 0 {
+			return 0, nil
 		}
 	}
-	return true, nil
+	return 1, nil
 }
 
 func orBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -628,16 +636,16 @@ func orBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		if err != nil {
 			return nil, err
 		}
-		bv, ok := ev.(bool)
+		bv, ok := ev.(int64)
 		if !ok {
-			// 評価結果がboolに変換できない場合はエラーになる。
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeBoolean, ev)
+			// 評価結果がint64に変換できない場合はエラーになる。
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeOfIntegerType, ev)
 		}
-		if bv {
-			return true, nil
+		if bv != 0 {
+			return 1, nil
 		}
 	}
-	return false, nil
+	return 0, nil
 }
 
 func strBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -657,8 +665,6 @@ func strBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			result += fmt.Sprint(v)
 		case string:
 			result += v
-		case bool:
-			result += fmt.Sprint(v)
 		case time.Time:
 			result += fmt.Sprint(v)
 		default:
@@ -687,11 +693,6 @@ func intBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			return nil, err
 		}
 		return iv, nil
-	case bool:
-		if v {
-			return int64(1), nil
-		}
-		return int64(0), nil
 	default:
 		return nil, newEvalError(lst.Position(), ErrorInvalidOperation)
 	}

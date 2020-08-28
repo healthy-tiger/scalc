@@ -60,13 +60,13 @@ func ifBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 	if err != nil {
 		return nil, err
 	}
-	if cond, ok := p.(bool); ok {
-		if cond {
+	if cond, ok := p.(int64); ok {
+		if cond != 0 {
 			return EvalElement(lst.ElementAt(2), ns)
 		}
 		return EvalElement(lst.ElementAt(3), ns)
 	}
-	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeBoolean, p)
+	return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, p)
 }
 
 func whileBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -75,13 +75,13 @@ func whileBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 	}
 	condelm := lst.ElementAt(1)
 	bodyelm := lst.ElementAt(2)
-	cond, err := EvalAsBool(condelm, ns)
+	cond, err := EvalAsInt(condelm, ns)
 	count := int64(0)
-	for err == nil && cond {
+	for err == nil && cond != 0 {
 		count++
 		_, err = EvalElement(bodyelm, ns)
 		if err == nil { // bodyelmを評価してエラーがなければ再度、ループの条件を確認する。
-			cond, err = EvalAsBool(condelm, ns)
+			cond, err = EvalAsInt(condelm, ns)
 		}
 	}
 	if err != nil { // エラーで抜けた場合はEvalError

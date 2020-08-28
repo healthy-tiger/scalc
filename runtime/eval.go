@@ -35,19 +35,6 @@ func (f *Function) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 	return EvalList(f.body, lns)
 }
 
-// EvalAsBool 名前空間nsでelmを評価し、その結果をboolとして返す。boolでない結果の場合はエラーを返す。
-func EvalAsBool(elm parser.SyntaxElement, ns *Namespace) (bool, error) {
-	r, err := EvalElement(elm, ns)
-	if err != nil {
-		return false, err
-	}
-	c, ok := r.(bool)
-	if ok {
-		return c, nil
-	}
-	return false, newEvalError(elm.Position(), ErrorOperantsMustBeBoolean, r)
-}
-
 // EvalAsInt 名前空間nsでelmを評価し、その結果をint64として返す。int64でない結果の場合はエラーを返す。
 func EvalAsInt(elm parser.SyntaxElement, ns *Namespace) (int64, error) {
 	r, err := EvalElement(elm, ns)

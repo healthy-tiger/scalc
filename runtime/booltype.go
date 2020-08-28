@@ -9,6 +9,6 @@ const (
 func RegisterBoolType(ns *Namespace) {
 	trueid := ns.GetSymbolID(trueSymbol)
 	falseid := ns.GetSymbolID(falseSymbol)
-	ns.Set(trueid, true)
-	ns.Set(falseid, false)
+	ns.Set(trueid, int64(1))
+	ns.Set(falseid, int64(0))
 }
