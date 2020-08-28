@@ -140,7 +140,7 @@ func funcBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 		}
 		args[i] = s
 	}
-	return &Function{args, body.(*parser.List)}, nil
+	return &Function{args, body.(*parser.List), nil, nil}, nil
 }
 
 // RegisterStmt 文に関する拡張関数を登録する。

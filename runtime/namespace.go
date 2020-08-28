@@ -55,7 +55,7 @@ func (ns *Namespace) Root() *Namespace {
 func (ns *Namespace) RegisterExtension(symbolName string, extobj interface{}, extbody func(interface{}, *parser.List, *Namespace) (interface{}, error)) parser.SymbolID {
 	root := ns.Root()
 	sid := root.symtbl.GetSymbolID(symbolName)
-	root.Set(sid, &Extension{extobj, extbody})
+	root.Set(sid, &Function{nil, nil, extobj, extbody})
 	return sid
 }
 
