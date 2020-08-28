@@ -26,38 +26,46 @@ func dateBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 6)
 	}
 
-	year, err := EvalAsInt(lst.ElementAt(1), ns)
-	if err != nil {
-		return nil, err
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = ev
 	}
-	month, err := EvalAsInt(lst.ElementAt(2), ns)
-	if err != nil {
-		return nil, err
+
+	year, ok := params[1].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
+	}
+	month, ok := params[2].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[2])
 	}
 	if month < 1 || month > 12 {
-		return nil, newEvalError(lst.Position(), ErrorValueOutOfRange, month, 1, 12)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorValueOutOfRange, month, 1, 12)
 	}
 
-	day, err := EvalAsInt(lst.ElementAt(3), ns)
-	if err != nil {
-		return nil, err
+	day, ok := params[3].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(3).Position(), ErrorOperantsMustBeOfIntegerType, params[3])
 	}
+	hour, ok := params[4].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(4).Position(), ErrorOperantsMustBeOfIntegerType, params[4])
+	}
+	min, ok := params[5].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(5).Position(), ErrorOperantsMustBeOfIntegerType, params[5])
+	}
+	sec, ok := params[6].(int64)
+	if !ok {
+		return nil, newEvalError(lst.ElementAt(6).Position(), ErrorOperantsMustBeOfIntegerType, params[6])
+	}
+	nanosec := int64(0)
 
-	hour, err := EvalAsInt(lst.ElementAt(4), ns)
-	if err != nil {
-		return nil, err
-	}
-
-	min, err := EvalAsInt(lst.ElementAt(5), ns)
-	if err != nil {
-		return nil, err
-	}
-	sec, err := EvalAsInt(lst.ElementAt(6), ns)
-	if err != nil {
-		return nil, err
-	}
-
-	return time.Date(int(year), time.Month(month), int(day), int(hour), int(min), int(sec), 0, time.Local).Unix(), nil
+	return time.Date(int(year), time.Month(month), int(day), int(hour), int(min), int(sec), int(nanosec), time.Local).Unix(), nil
 }
 
 func nowBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
