@@ -1,31 +1,64 @@
 package runtime
 
-import "github.com/healthy-tiger/scalc/parser"
+import (
+	"github.com/healthy-tiger/scalc/parser"
+)
+
+// シンボルに対する値の型を表す。
+const (
+	IntTag = iota
+	FloatTag
+	StringTag
+	FuncPtrTag
+	ErrTag
+)
+
+// TaggedValue シンボルの値と型をセットで格納する構造体
+type TaggedValue struct {
+	Tag   int
+	Value interface{}
+}
 
 // Namespace シンボルと値のマップ
 type Namespace struct {
 	symtbl   *parser.SymbolTable // ルートの名前空間の場合のみ非nilになる。
 	root     *Namespace
 	parent   *Namespace
-	bindings map[parser.SymbolID]interface{} // string, int64, float64, *Functionのいれずれか
+	bindings map[parser.SymbolID]TaggedValue // string, int64, float64, *Functionのいれずれか
 }
 
 // Get nsからシンボルID idに対応する値を取得する。
-func (ns *Namespace) Get(id parser.SymbolID) (interface{}, bool) {
+func (ns *Namespace) Get(id parser.SymbolID, sv *TaggedValue) bool {
 	n := ns
 	for n != nil {
-		v, ok := n.bindings[id]
+		b, ok := n.bindings[id]
 		if ok {
-			return v, true
+			sv.Tag = b.Tag
+			sv.Value = b.Value
+			return true
 		}
 		n = n.parent
 	}
-	return nil, false
+	return false
 }
 
 // Set nsにシンボルID idに対応する値を格納する。
 func (ns *Namespace) Set(id parser.SymbolID, value interface{}) {
-	ns.bindings[id] = value
+	var sv TaggedValue
+	switch value.(type) {
+	case int64:
+		sv.Tag = IntTag
+	case float64:
+		sv.Tag = FloatTag
+	case string:
+		sv.Tag = StringTag
+	case *Function:
+		sv.Tag = FuncPtrTag
+	default:
+		panic("Invalid Type of symbol.")
+	}
+	sv.Value = value
+	ns.bindings[id] = sv
 }
 
 // Parent nsの親の名前空間を返す。
@@ -69,7 +102,7 @@ func NewNamespace(parent *Namespace) *Namespace {
 			p = p.parent
 		}
 	}
-	return &Namespace{nil, p, parent, make(map[parser.SymbolID]interface{})}
+	return &Namespace{nil, p, parent, make(map[parser.SymbolID]TaggedValue)}
 }
 
 // NewRootNamespace 新しく最上位の名前空間を作る

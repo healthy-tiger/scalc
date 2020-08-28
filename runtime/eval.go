@@ -64,7 +64,8 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 		return EvalList(st.(*parser.List), ns)
 	}
 	if sid, ok := st.SymbolValue(); ok {
-		sv, ok := ns.Get(sid)
+		var sv TaggedValue
+		ok := ns.Get(sid, &sv)
 		if !ok {
 			sn, err := ns.GetSymbolName(sid)
 			if err != nil {
@@ -72,9 +73,9 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 			}
 			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol, sn)
 		}
-		switch ev := sv.(type) {
-		case int64, float64, string, *Function:
-			return ev, nil
+		switch sv.Tag {
+		case IntTag, FloatTag, StringTag, FuncPtrTag:
+			return sv.Value, nil
 		default:
 			panic("Unexpected evaluation result type")
 		}
