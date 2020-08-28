@@ -3,7 +3,6 @@ package runtime
 import (
 	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/healthy-tiger/scalc/parser"
 )
@@ -86,15 +85,6 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			}
 		}
 		return v, nil
-	case time.Time:
-		for i := 2; i < lst.Len(); i++ {
-			if iv, ok := params[i].(int64); ok {
-				v = v.Add(time.Duration(iv))
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
-		}
-		return v, nil
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, fst)
 	}
@@ -136,15 +126,6 @@ func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			}
 		}
 		return v, nil
-	case time.Time:
-		// 時刻同士の減算の場合は2引数に限る
-		if lst.Len() != 3 {
-			return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
-		}
-		if tv, ok := params[2].(time.Time); ok {
-			return int64(v.Sub(tv)), nil
-		}
-		return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, params[1], params[2])
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, fst)
 	}
@@ -279,20 +260,6 @@ func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 				}
 			} else {
 				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
-		}
-		return int64(1), nil
-	case time.Time:
-		if lst.Len() != 3 {
-			return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
-		}
-		for i := 2; i < lst.Len(); i++ {
-			if tv, ok := params[i].(time.Time); ok {
-				if !v.Equal(tv) {
-					return int64(0), nil
-				}
-			} else {
-				return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, params[1], params[2])
 			}
 		}
 		return int64(1), nil
@@ -471,11 +438,6 @@ func ltBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 			return a < b, nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
-	case time.Time:
-		if b, ok := pb.(time.Time); ok {
-			return a.Before(b), nil
-		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, pa)
 	}
@@ -504,11 +466,6 @@ func lteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	case float64:
 		if b, ok := pb.(float64); ok {
 			return a <= b, nil
-		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
-	case time.Time:
-		if b, ok := pb.(time.Time); ok {
-			return a.Before(b) || a.Equal(b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
@@ -541,11 +498,6 @@ func gtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 			return a > b, nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
-	case time.Time:
-		if b, ok := pb.(time.Time); ok {
-			return a.After(b), nil
-		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, pa)
 	}
@@ -574,11 +526,6 @@ func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	case float64:
 		if b, ok := pb.(float64); ok {
 			return a >= b, nil
-		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
-	case time.Time:
-		if b, ok := pb.(time.Time); ok {
-			return a.After(b) || a.Equal(b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
@@ -665,8 +612,6 @@ func strBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			result += fmt.Sprint(v)
 		case string:
 			result += v
-		case time.Time:
-			result += fmt.Sprint(v)
 		default:
 			return nil, newEvalError(lst.Position(), ErrorInvalidOperation)
 		}

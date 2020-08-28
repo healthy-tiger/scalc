@@ -1,8 +1,6 @@
 package runtime
 
 import (
-	"time"
-
 	"github.com/healthy-tiger/scalc/parser"
 )
 
@@ -75,7 +73,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol, sn)
 		}
 		switch ev := sv.(type) {
-		case int64, float64, string, *Function, time.Time:
+		case int64, float64, string, *Function:
 			return ev, nil
 		default:
 			panic("Unexpected evaluation result type")

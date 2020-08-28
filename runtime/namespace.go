@@ -7,7 +7,7 @@ type Namespace struct {
 	symtbl   *parser.SymbolTable // ルートの名前空間の場合のみ非nilになる。
 	root     *Namespace
 	parent   *Namespace
-	bindings map[parser.SymbolID]interface{} // string, int64, float64, bool, time.Time, *Function, *Extensionのいれずれか
+	bindings map[parser.SymbolID]interface{} // string, int64, float64, *Functionのいれずれか
 }
 
 // Get nsからシンボルID idに対応する値を取得する。

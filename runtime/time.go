@@ -11,13 +11,9 @@ const (
 	nowSymbol        = "now"
 	daySymbol        = "day"
 	hourSymbol       = "hour"
-	iszeroSymbol     = "iszero"
-	localSymbol      = "local"
 	minuteSymbol     = "minute"
 	monthSymbol      = "month"
-	nanosecondSymbol = "nanosecond"
 	secondSymbol     = "second"
-	utcSymbol        = "utc"
 	weekdaySymbol    = "weekday"
 	yearSymbol       = "year"
 	yeardaySymbol    = "yearday"
@@ -26,8 +22,8 @@ const (
 )
 
 func dateBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() != 8 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 7)
+	if lst.Len() != 7 {
+		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 6)
 	}
 
 	year, err := EvalAsInt(lst.ElementAt(1), ns)
@@ -60,214 +56,130 @@ func dateBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 	if err != nil {
 		return nil, err
 	}
-	nsec, err := EvalAsInt(lst.ElementAt(7), ns)
 
-	return time.Date(int(year), time.Month(month), int(day), int(hour), int(min), int(sec), int(nsec), time.Local), nil
+	return time.Date(int(year), time.Month(month), int(day), int(hour), int(min), int(sec), 0, time.Local).Unix(), nil
 }
 
 func nowBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 1 {
 		return nil, newEvalError(lst.Position(), ErrorTooManyArguments, lst.Len()-1, 0)
 	}
-	return time.Now(), nil
+	return time.Now().Unix(), nil
 }
 
 func dayBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.Day()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	return int64(time.Unix(sec, int64(0)).Day()), nil
 }
 
 func hourBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.Hour()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
-}
-
-func iszeroBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
-	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
-	if err != nil {
-		return nil, err
-	}
-	if t, ok := e1.(time.Time); ok {
-		return t.IsZero(), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
-}
-
-func localBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
-	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
-	if err != nil {
-		return nil, err
-	}
-	if t, ok := e1.(time.Time); ok {
-		return t.Local(), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	return int64(time.Unix(sec, int64(0)).Hour()), nil
 }
 
 func minuteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.Minute()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	return int64(time.Unix(sec, int64(0)).Minute()), nil
 }
 
 func monthBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.Month()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
-}
-
-func nanosecondBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
-	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
-	if err != nil {
-		return nil, err
-	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.Hour()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	return int64(time.Unix(sec, int64(0)).Month()), nil
 }
 
 func secondBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.Second()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
-}
-
-func utcBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
-	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
-	if err != nil {
-		return nil, err
-	}
-	if t, ok := e1.(time.Time); ok {
-		return t.UTC(), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	return int64(time.Unix(sec, int64(0)).Second()), nil
 }
 
 func weekdayBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.Weekday()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	return int64(time.Unix(sec, int64(0)).Weekday()), nil
 }
 
 func yearBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.Year()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	return int64(time.Unix(sec, int64(0)).Year()), nil
 }
 
 func yeardayBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		return int64(t.YearDay()), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	return int64(time.Unix(sec, int64(0)).YearDay()), nil
+
 }
 
 func zoneBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		z, _ := t.Zone()
-		return z, nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	t := time.Unix(sec, int64(0))
+	z, _ := t.Zone()
+	return z, nil
 }
 
 func zoneoffsetBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
 		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
-	e1, err := EvalElement(lst.ElementAt(1), ns)
+	sec, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
 		return nil, err
 	}
-	if t, ok := e1.(time.Time); ok {
-		_, o := t.Zone()
-		return int64(o), nil
-	}
-	return nil, newEvalError(lst.Position(), ErrorTypeMissmatch, "time", e1)
+	t := time.Unix(sec, int64(0))
+	_, o := t.Zone()
+	return int64(o), nil
 }
 
 // RegisterTimeFunc 時刻に関する拡張関数を登録する。
@@ -276,13 +188,9 @@ func RegisterTimeFunc(ns *Namespace) {
 	ns.RegisterExtension(nowSymbol, nil, nowBody)
 	ns.RegisterExtension(daySymbol, nil, dayBody)
 	ns.RegisterExtension(hourSymbol, nil, hourBody)
-	ns.RegisterExtension(iszeroSymbol, nil, iszeroBody)
-	ns.RegisterExtension(localSymbol, nil, localBody)
 	ns.RegisterExtension(minuteSymbol, nil, minuteBody)
 	ns.RegisterExtension(monthSymbol, nil, monthBody)
-	ns.RegisterExtension(nanosecondSymbol, nil, nanosecondBody)
 	ns.RegisterExtension(secondSymbol, nil, secondBody)
-	ns.RegisterExtension(utcSymbol, nil, utcBody)
 	ns.RegisterExtension(weekdaySymbol, nil, weekdayBody)
 	ns.RegisterExtension(yearSymbol, nil, yearBody)
 	ns.RegisterExtension(yeardaySymbol, nil, yeardayBody)
