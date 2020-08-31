@@ -15,12 +15,33 @@ type Function struct {
 	native      func(obj interface{}, lst *parser.List, ns *Namespace) (interface{}, error) // ネイティブ関数の本体
 }
 
+func isValidType(v interface{}) bool {
+	switch v.(type) {
+	case int64, float64, string, *Function:
+		return true
+	default:
+		return false
+	}
+}
+
+func boolToInt(b bool) int64 {
+	if b {
+		return 1
+	}
+	return 0
+}
+
 // Eval 関数fをlstの第2要素以降を引数に、グローバルの名前空間globalsで評価し、その結果を返す。
 func (f *Function) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 	if f.body != nil && f.params != nil {
 		return f.EvalAsFunction(lst, ns)
 	} else if f.native != nil {
-		return f.EvalAsNative(lst, ns)
+		result, err := f.EvalAsNative(lst, ns)
+		// ネイティブ関数が正常に値を返しても、無効な型の場合は処理系を即座に止める。
+		if err == nil && !isValidType(result) {
+			panic(fmt.Sprintf("invalid return type %v", reflect.TypeOf(result)))
+		}
+		return result, err
 	}
 	panic("Nil function.")
 }
