@@ -118,12 +118,12 @@ var eqtests []optest = []optest{
 }
 
 var lttests []optest = []optest{
-	{`(< 1 2)`, false, false, true},
-	{`(< 2 1)`, false, false, false},
-	{`(< 2 2)`, false, false, false},
-	{`(< 1.0 2.0)`, false, false, true},
-	{`(< 2.0 1.0)`, false, false, false},
-	{`(< 2.0 2.0)`, false, false, false},
+	{`(< 1 2)`, false, false, int64(1)},
+	{`(< 2 1)`, false, false, int64(0)},
+	{`(< 2 2)`, false, false, int64(0)},
+	{`(< 1.0 2.0)`, false, false, int64(1)},
+	{`(< 2.0 1.0)`, false, false, int64(0)},
+	{`(< 2.0 2.0)`, false, false, int64(0)},
 	{`(< 1 2.0)`, false, true, nil},
 	{`(< 2 1.0)`, false, true, nil},
 	{`(< 2 2.0)`, false, true, nil},
@@ -134,12 +134,12 @@ var lttests []optest = []optest{
 }
 
 var ltetests []optest = []optest{
-	{`(<= 1 2)`, false, false, true},
-	{`(<= 2 1)`, false, false, false},
-	{`(<= 2 2)`, false, false, true},
-	{`(<= 1.0 2.0)`, false, false, true},
-	{`(<= 2.0 1.0)`, false, false, false},
-	{`(<= 2.0 2.0)`, false, false, true},
+	{`(<= 1 2)`, false, false, int64(1)},
+	{`(<= 2 1)`, false, false, int64(0)},
+	{`(<= 2 2)`, false, false, int64(1)},
+	{`(<= 1.0 2.0)`, false, false, int64(1)},
+	{`(<= 2.0 1.0)`, false, false, int64(0)},
+	{`(<= 2.0 2.0)`, false, false, int64(1)},
 	{`(<= 1 2.0)`, false, true, nil},
 	{`(<= 2 1.0)`, false, true, nil},
 	{`(<= 2 2.0)`, false, true, nil},
@@ -150,12 +150,12 @@ var ltetests []optest = []optest{
 }
 
 var gttests []optest = []optest{
-	{`(> 1 2)`, false, false, false},
-	{`(> 2 1)`, false, false, true},
-	{`(> 2 2)`, false, false, false},
-	{`(> 1.0 2.0)`, false, false, false},
-	{`(> 2.0 1.0)`, false, false, true},
-	{`(> 2.0 2.0)`, false, false, false},
+	{`(> 1 2)`, false, false, int64(0)},
+	{`(> 2 1)`, false, false, int64(1)},
+	{`(> 2 2)`, false, false, int64(0)},
+	{`(> 1.0 2.0)`, false, false, int64(0)},
+	{`(> 2.0 1.0)`, false, false, int64(1)},
+	{`(> 2.0 2.0)`, false, false, int64(0)},
 	{`(> 1 2.0)`, false, true, nil},
 	{`(> 2 1.0)`, false, true, nil},
 	{`(> 2 2.0)`, false, true, nil},
@@ -166,12 +166,12 @@ var gttests []optest = []optest{
 }
 
 var gtetests []optest = []optest{
-	{`(>= 1 2)`, false, false, false},
-	{`(>= 2 1)`, false, false, true},
-	{`(>= 2 2)`, false, false, true},
-	{`(>= 1.0 2.0)`, false, false, false},
-	{`(>= 2.0 1.0)`, false, false, true},
-	{`(>= 2.0 2.0)`, false, false, true},
+	{`(>= 1 2)`, false, false, int64(0)},
+	{`(>= 2 1)`, false, false, int64(1)},
+	{`(>= 2 2)`, false, false, int64(1)},
+	{`(>= 1.0 2.0)`, false, false, int64(0)},
+	{`(>= 2.0 1.0)`, false, false, int64(1)},
+	{`(>= 2.0 2.0)`, false, false, int64(1)},
 	{`(>= 1 2.0)`, false, true, nil},
 	{`(>= 2 1.0)`, false, true, nil},
 	{`(>= 2 2.0)`, false, true, nil},
