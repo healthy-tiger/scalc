@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/healthy-tiger/scalc/parser"
@@ -49,9 +50,42 @@ func init() {
 	ErrorNonArithmeticDataType = RegisterEvalError("Non-arithmetic data type: '%v)")
 }
 
-// Eval オペラントの評価結果がすべてint64、すべてfloat64の場合にそれらのすべてを加算（または連結）した結果を返す。
+func isArithmeticDataType(v *interface{}) bool {
+	switch (*v).(type) {
+	case parser.SInt, float64:
+		return true
+	default:
+		return false
+	}
+}
+
+func isSameType(a *interface{}, b *interface{}) bool {
+	switch (*a).(type) {
+	case parser.SInt:
+		if _, ok := (*b).(parser.SInt); ok {
+			return true
+		}
+	case float64:
+		if _, ok := (*b).(float64); ok {
+			return true
+		}
+	case *Function:
+		if _, ok := (*b).(*Function); ok {
+			return true
+		}
+	case string:
+		if _, ok := (*b).(string); ok {
+			return true
+		}
+	default:
+		panic("Unexpected Data Type.")
+	}
+	return false
+}
+
+// Eval オペラントの評価結果がすべてparser.SInt、すべてfloat64の場合にそれらのすべてを加算（または連結）した結果を返す。
 func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 2 {
+	if lst.Len() < 3 {
 		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len()-1, 1)
 	}
 	// 引数をすべて評価する。
@@ -64,115 +98,32 @@ func addBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		params[i] = ev
 	}
 
-	// 引数を最初の引数の型に合わせながらすべて加算する。
-	fst := params[1]
-	switch v := fst.(type) {
-	case int64:
-		for i := 2; i < lst.Len(); i++ {
-			if iv, ok := params[i].(int64); ok {
-				v = v + iv
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
-		}
-		return v, nil
-	case float64:
-		for i := 2; i < lst.Len(); i++ {
-			if fv, ok := params[i].(float64); ok {
-				v = v + fv
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
-		}
-		return v, nil
-	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, fst)
-	}
-}
-
-// Eval オペラントの評価結果がすべてint64またはすべてfloat64の値の場合にそれらすべてを減算した結果を返す。
-func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len()-1, 2)
-	}
-	// 引数をすべて評価する。
-	params := make([]interface{}, lst.Len())
-	for i := 1; i < lst.Len(); i++ {
-		ev, err := EvalElement(lst.ElementAt(i), ns)
-		if err != nil {
-			return nil, err
-		}
-		params[i] = ev
-	}
-
-	// 引数を最初の引数の型に合わせながらすべて加算する。
-	fst := params[1]
-	switch v := fst.(type) {
-	case int64:
-		for i := 2; i < lst.Len(); i++ {
-			if iv, ok := params[i].(int64); ok {
-				v = v - iv
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
-		}
-		return v, nil
-	case float64:
-		for i := 2; i < lst.Len(); i++ {
-			if fv, ok := params[i].(float64); ok {
-				v = v - fv
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
-		}
-		return v, nil
-	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, fst)
-	}
-}
-
-// Eval オペラントの評価結果がすべてint64またはすべてfloat64の値の場合にそれらすべてを乗算した結果を返す。
-func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
-	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len()-1, 2)
-	}
-	// 引数をすべて評価する。
-	params := make([]interface{}, lst.Len())
-	for i := 1; i < lst.Len(); i++ {
-		ev, err := EvalElement(lst.ElementAt(i), ns)
-		if err != nil {
-			return nil, err
-		}
-		params[i] = ev
-	}
-
-	// 引数を最初の引数の型に合わせながらすべて乗算する。
 	result := params[1]
+	if !isArithmeticDataType(&result) {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, reflect.TypeOf(result))
+	}
 	for i := 2; i < lst.Len(); i++ {
+		b := params[i]
+		if !isArithmeticDataType(&b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorNonArithmeticDataType, reflect.TypeOf(b))
+		}
+		if !isSameType(&result, &b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, reflect.TypeOf(result), reflect.TypeOf(b))
+		}
 		switch v := result.(type) {
-		case int64:
-			if iv, ok := params[i].(int64); ok {
-				result = v * iv
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
+		case parser.SInt:
+			result = v + b.(parser.SInt)
 		case float64:
-			if fv, ok := params[i].(float64); ok {
-				result = v * float64(fv)
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
-		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorNonArithmeticDataType, params[i])
+			result = v + b.(float64)
 		}
 	}
 	return result, nil
 }
 
-// Eval オペラントの評価結果がすべてint64またはすべてfloat64の値の場合にそれらすべてを除算した結果を返す。
-func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+// Eval オペラントの評価結果がすべてparser.SIntまたはすべてfloat64の値の場合にそれらすべてを減算した結果を返す。
+func subBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() < 3 {
-		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len()-1, 2)
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len()-1, 1)
 	}
 	// 引数をすべて評価する。
 	params := make([]interface{}, lst.Len())
@@ -184,30 +135,105 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		params[i] = ev
 	}
 
-	// 引数を最初の引数の型に合わせながらすべて除算する。
 	result := params[1]
+	if !isArithmeticDataType(&result) {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, reflect.TypeOf(result))
+	}
 	for i := 2; i < lst.Len(); i++ {
+		b := params[i]
+		if !isArithmeticDataType(&b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorNonArithmeticDataType, reflect.TypeOf(b))
+		}
+		if !isSameType(&result, &b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, reflect.TypeOf(result), reflect.TypeOf(b))
+		}
 		switch v := result.(type) {
-		case int64:
-			if iv, ok := params[i].(int64); ok {
-				if iv == 0 {
-					return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero)
-				}
-				result = v / iv
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
+		case parser.SInt:
+			result = v - b.(parser.SInt)
 		case float64:
-			if fv, ok := params[i].(float64); ok {
-				if fv == 0.0 {
-					return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero)
-				}
-				result = v / float64(fv)
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
+			result = v - b.(float64)
+		}
+	}
+	return result, nil
+}
+
+// Eval オペラントの評価結果がすべてparser.SIntまたはすべてfloat64の値の場合にそれらすべてを乗算した結果を返す。
+func mulBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len()-1, 1)
+	}
+	// 引数をすべて評価する。
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = ev
+	}
+
+	result := params[1]
+	if !isArithmeticDataType(&result) {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, reflect.TypeOf(result))
+	}
+	for i := 2; i < lst.Len(); i++ {
+		b := params[i]
+		if !isArithmeticDataType(&b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorNonArithmeticDataType, reflect.TypeOf(b))
+		}
+		if !isSameType(&result, &b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, reflect.TypeOf(result), reflect.TypeOf(b))
+		}
+		switch v := result.(type) {
+		case parser.SInt:
+			result = v * b.(parser.SInt)
+		case float64:
+			result = v * b.(float64)
+		}
+	}
+	return result, nil
+}
+
+// Eval オペラントの評価結果がすべてparser.SIntまたはすべてfloat64の値の場合にそれらすべてを除算した結果を返す。
+func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() < 3 {
+		return nil, newEvalError(lst.Position(), ErrorInsufficientNumberOfArguments, lst.Len()-1, 1)
+	}
+	// 引数をすべて評価する。
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		ev, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = ev
+	}
+
+	result := params[1]
+	if !isArithmeticDataType(&result) {
+		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, reflect.TypeOf(result))
+	}
+	for i := 2; i < lst.Len(); i++ {
+		b := params[i]
+		if !isArithmeticDataType(&b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorNonArithmeticDataType, reflect.TypeOf(b))
+		}
+		if !isSameType(&result, &b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, reflect.TypeOf(result), reflect.TypeOf(b))
+		}
+		switch v := result.(type) {
+		case parser.SInt:
+			bi := b.(parser.SInt)
+			if bi == 0 {
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero)
 			}
-		default:
-			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorNonArithmeticDataType, params[i])
+			result = v / bi
+		case float64:
+			bf := b.(float64)
+			if bf == 0.0 {
+				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero)
+			}
+			result = v / bf
 		}
 	}
 	return result, nil
@@ -227,46 +253,17 @@ func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		params[i] = ev
 	}
 
-	// 引数を最初の引数の型に合わせながらすべて加算する。
 	fst := params[1]
-	switch v := fst.(type) {
-	case int64:
-		for i := 2; i < lst.Len(); i++ {
-			if iv, ok := params[i].(int64); ok {
-				if v != iv {
-					return int64(0), nil
-				}
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
+	for i := 2; i < lst.Len(); i++ {
+		b := params[i]
+		if !isSameType(&fst, &b) {
+			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, reflect.TypeOf(fst), reflect.TypeOf(b))
 		}
-		return int64(1), nil
-	case float64:
-		for i := 2; i < lst.Len(); i++ {
-			if fv, ok := params[i].(float64); ok {
-				if v != fv {
-					return int64(0), nil
-				}
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
+		if fst != b {
+			return parser.SInt(0), nil
 		}
-		return int64(1), nil
-	case string:
-		for i := 2; i < lst.Len(); i++ {
-			if sv, ok := params[i].(string); ok {
-				if v != sv {
-					return int64(0), nil
-				}
-			} else {
-				return nil, newEvalError(lst.ElementAt(i).Position(), ErrorTypeMissmatch, params[1], params[i])
-			}
-		}
-		return int64(1), nil
-	default:
-		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, fst)
 	}
-
+	return parser.SInt(1), nil
 }
 
 func bitwiseANDbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -283,12 +280,12 @@ func bitwiseANDbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 		params[i] = ev
 	}
 
-	result, ok := params[1].(int64)
+	result, ok := params[1].(parser.SInt)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
-		ip, ok := params[i].(int64)
+		ip, ok := params[i].(parser.SInt)
 		if !ok {
 			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
@@ -311,12 +308,12 @@ func bitwiseORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{},
 		params[i] = ev
 	}
 
-	result, ok := params[1].(int64)
+	result, ok := params[1].(parser.SInt)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
-		ip, ok := params[i].(int64)
+		ip, ok := params[i].(parser.SInt)
 		if !ok {
 			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
@@ -340,7 +337,7 @@ func bitwiseXORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 		params[i] = ev
 	}
 
-	result, ok := params[1].(int64)
+	result, ok := params[1].(parser.SInt)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
@@ -348,7 +345,7 @@ func bitwiseXORbody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 		return ^result, nil
 	}
 	for i := 2; i < lst.Len(); i++ {
-		ip, ok := params[i].(int64)
+		ip, ok := params[i].(parser.SInt)
 		if !ok {
 			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
@@ -371,12 +368,12 @@ func lShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 		params[i] = ev
 	}
 
-	result, ok := params[1].(int64)
+	result, ok := params[1].(parser.SInt)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
-		ip, ok := params[i].(int64)
+		ip, ok := params[i].(parser.SInt)
 		if !ok {
 			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
@@ -399,12 +396,12 @@ func rShiftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 		params[i] = ev
 	}
 
-	result, ok := params[1].(int64)
+	result, ok := params[1].(parser.SInt)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
 	for i := 2; i < lst.Len(); i++ {
-		ip, ok := params[i].(int64)
+		ip, ok := params[i].(parser.SInt)
 		if !ok {
 			return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[i])
 		}
@@ -428,16 +425,16 @@ func ltBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		return nil, err
 	}
 	switch a := pa.(type) {
-	case int64:
-		if b, ok := pb.(int64); ok {
+	case parser.SInt:
+		if b, ok := pb.(parser.SInt); ok {
 			return a < b, nil
 		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	case float64:
 		if b, ok := pb.(float64); ok {
 			return a < b, nil
 		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, pa)
 	}
@@ -458,16 +455,16 @@ func lteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		return nil, err
 	}
 	switch a := pa.(type) {
-	case int64:
-		if b, ok := pb.(int64); ok {
+	case parser.SInt:
+		if b, ok := pb.(parser.SInt); ok {
 			return a <= b, nil
 		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	case float64:
 		if b, ok := pb.(float64); ok {
 			return a <= b, nil
 		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, pa)
 	}
@@ -488,11 +485,11 @@ func gtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		return nil, err
 	}
 	switch a := pa.(type) {
-	case int64:
-		if b, ok := pb.(int64); ok {
+	case parser.SInt:
+		if b, ok := pb.(parser.SInt); ok {
 			return a > b, nil
 		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	case float64:
 		if b, ok := pb.(float64); ok {
 			return a > b, nil
@@ -518,16 +515,16 @@ func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		return nil, err
 	}
 	switch a := pa.(type) {
-	case int64:
-		if b, ok := pb.(int64); ok {
+	case parser.SInt:
+		if b, ok := pb.(parser.SInt); ok {
 			return a >= b, nil
 		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	case float64:
 		if b, ok := pb.(float64); ok {
 			return a >= b, nil
 		}
-		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	default:
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorNonArithmeticDataType, pa)
 	}
@@ -542,7 +539,7 @@ func notBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	if b, ok := p.(int64); ok {
+	if b, ok := p.(parser.SInt); ok {
 		if b != 0 {
 			return 0, nil
 		}
@@ -561,9 +558,9 @@ func andBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		if err != nil {
 			return nil, err
 		}
-		bv, ok := ev.(int64)
+		bv, ok := ev.(parser.SInt)
 		if !ok {
-			// 評価結果がint64に変換できない場合はエラーになる。
+			// 評価結果がparser.SIntに変換できない場合はエラーになる。
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeOfIntegerType, ev)
 		}
 		if bv == 0 {
@@ -583,9 +580,9 @@ func orBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 		if err != nil {
 			return nil, err
 		}
-		bv, ok := ev.(int64)
+		bv, ok := ev.(parser.SInt)
 		if !ok {
-			// 評価結果がint64に変換できない場合はエラーになる。
+			// 評価結果がparser.SIntに変換できない場合はエラーになる。
 			return nil, newEvalError(lst.ElementAt(i).Position(), ErrorOperantsMustBeOfIntegerType, ev)
 		}
 		if bv != 0 {
@@ -606,7 +603,7 @@ func strBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 			return nil, err
 		}
 		switch v := ev.(type) {
-		case int64:
+		case parser.SInt:
 			result += fmt.Sprint(v)
 		case float64:
 			result += fmt.Sprint(v)
@@ -628,16 +625,16 @@ func intBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		return nil, err
 	}
 	switch v := ev.(type) {
-	case int64:
+	case parser.SInt:
 		return v, nil
 	case float64:
-		return int64(v), nil
+		return parser.SInt(v), nil
 	case string:
 		iv, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		return iv, nil
+		return parser.SInt(iv), nil
 	default:
 		return nil, newEvalError(lst.Position(), ErrorInvalidOperation)
 	}
@@ -652,7 +649,7 @@ func floatBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 		return nil, err
 	}
 	switch v := ev.(type) {
-	case int64:
+	case parser.SInt:
 		return float64(v), nil
 	case float64:
 		return v, nil

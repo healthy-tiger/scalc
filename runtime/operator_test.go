@@ -16,9 +16,9 @@ type optest struct {
 }
 
 var addtests []optest = []optest{
-	{`(+ 1 2 3)`, false, false, int64(1) + int64(2) + int64(3)},
-	{`(+ 1 2 (+ 10 20) 3)`, false, false, int64(1) + int64(2) + (int64(10) + int64(20)) + int64(3)},
-	{`(+ 1 2 (+ -10 -20) 3)`, false, false, int64(1) + int64(2) + (int64(-10) + int64(-20)) + int64(3)},
+	{`(+ 1 2 3)`, false, false, parser.SInt(1) + parser.SInt(2) + parser.SInt(3)},
+	{`(+ 1 2 (+ 10 20) 3)`, false, false, parser.SInt(1) + parser.SInt(2) + (parser.SInt(10) + parser.SInt(20)) + parser.SInt(3)},
+	{`(+ 1 2 (+ -10 -20) 3)`, false, false, parser.SInt(1) + parser.SInt(2) + (parser.SInt(-10) + parser.SInt(-20)) + parser.SInt(3)},
 	{`(+ 1.0 2.0 3.0)`, false, false, float64(1.0) + float64(2.0) + float64(3.0)},
 	{`(+ 1 2 (+ 10.0 20) 3)`, false, true, nil},
 	{`(+ 1 2 (+ -10.0 -20.0) 3)`, false, true, nil},
@@ -29,49 +29,49 @@ var addtests []optest = []optest{
 	{`(+ "abc" 1.0)`, false, true, nil},
 	{`(+ 1 + "abc")`, false, true, nil},
 	{`(+ "" 123)`, false, true, nil},
-	{`(+ true 1)`, false, false, int64(2)},
-	{`(+ 1 false)`, false, false, int64(1)},
-	{`(+ true false)`, false, false, int64(1)},
+	{`(+ true 1)`, false, false, parser.SInt(2)},
+	{`(+ 1 false)`, false, false, parser.SInt(1)},
+	{`(+ true false)`, false, false, parser.SInt(1)},
 	{`(+ true "true")`, false, true, nil},
 	{`(+)`, false, true, nil},
 }
 
 var subtests []optest = []optest{
-	{`(- 1 2 3)`, false, false, int64(1) - int64(2) - int64(3)},
-	{`(- 1 2 (- 10 20) 3)`, false, false, int64(1) - int64(2) - (int64(10) - int64(20)) - int64(3)},
-	{`(- 1 2 (- -10 -20) 3)`, false, false, int64(1) - int64(2) - (int64(-10) - int64(-20)) - int64(3)},
+	{`(- 1 2 3)`, false, false, parser.SInt(1) - parser.SInt(2) - parser.SInt(3)},
+	{`(- 1 2 (- 10 20) 3)`, false, false, parser.SInt(1) - parser.SInt(2) - (parser.SInt(10) - parser.SInt(20)) - parser.SInt(3)},
+	{`(- 1 2 (- -10 -20) 3)`, false, false, parser.SInt(1) - parser.SInt(2) - (parser.SInt(-10) - parser.SInt(-20)) - parser.SInt(3)},
 	{`(- 1.0 2.0 3.0)`, false, false, float64(1.0) - float64(2.0) - float64(3.0)},
 	{`(- 1 2 (- 10.0 20) 3)`, false, true, nil},
 	{`(- 1 2 (- -10.0 -20.0) 3)`, false, true, nil},
 	{`(- 1.0 2 3)`, false, true, nil},
 	{`(- 1 2.1 3.0)`, false, true, nil},
-	{`(- true 1)`, false, false, int64(0)},
-	{`(- 1 false)`, false, false, int64(1)},
-	{`(- true false)`, false, false, int64(1)},
+	{`(- true 1)`, false, false, parser.SInt(0)},
+	{`(- 1 false)`, false, false, parser.SInt(1)},
+	{`(- true false)`, false, false, parser.SInt(1)},
 	{`(- true "true")`, false, true, nil},
 	{`(-)`, false, true, nil},
 }
 
 var multests []optest = []optest{
-	{`(* 1 2 3)`, false, false, int64(1) * int64(2) * int64(3)},
-	{`(* 1 2 (* 10 20) 3)`, false, false, int64(1) * int64(2) * (int64(10) * int64(20)) * int64(3)},
-	{`(* 1 2 (* -10 -20) 3)`, false, false, int64(1) * int64(2) * (int64(-10) * int64(-20)) * int64(3)},
+	{`(* 1 2 3)`, false, false, parser.SInt(1) * parser.SInt(2) * parser.SInt(3)},
+	{`(* 1 2 (* 10 20) 3)`, false, false, parser.SInt(1) * parser.SInt(2) * (parser.SInt(10) * parser.SInt(20)) * parser.SInt(3)},
+	{`(* 1 2 (* -10 -20) 3)`, false, false, parser.SInt(1) * parser.SInt(2) * (parser.SInt(-10) * parser.SInt(-20)) * parser.SInt(3)},
 	{`(* 1.0 2.0 3.0)`, false, false, float64(1.0) * float64(2.0) * float64(3.0)},
 	{`(* 1 2 (* 10.0 20) 3)`, false, true, nil},
 	{`(* 1 2 (* -10.0 -20.0) 3)`, false, true, nil},
 	{`(* 1.0 2 3)`, false, true, nil},
 	{`(* 1 2.1 3.0)`, false, true, nil},
-	{`(* true 1)`, false, false, int64(1)},
-	{`(* 1 false)`, false, false, int64(0)},
-	{`(* true false)`, false, false, int64(0)},
+	{`(* true 1)`, false, false, parser.SInt(1)},
+	{`(* 1 false)`, false, false, parser.SInt(0)},
+	{`(* true false)`, false, false, parser.SInt(0)},
 	{`(* true "true")`, false, true, nil},
 	{`(*)`, false, true, nil},
 }
 
 var divtests []optest = []optest{
-	{`(/ 1 2 3)`, false, false, int64(1) / int64(2) / int64(3)},
-	{`(/ 4 2)`, false, false, int64(4) / int64(2)},
-	{`(/ 3 2)`, false, false, int64(3) / int64(2)},
+	{`(/ 1 2 3)`, false, false, parser.SInt(1) / parser.SInt(2) / parser.SInt(3)},
+	{`(/ 4 2)`, false, false, parser.SInt(4) / parser.SInt(2)},
+	{`(/ 3 2)`, false, false, parser.SInt(3) / parser.SInt(2)},
 	{`(/ 1 0)`, false, true, nil},
 	{`(/ 1 2 (/ 10 20) 3)`, false, true, nil},
 	{`(/ 1 2 (/ -10 -20) 3)`, false, true, nil},
@@ -81,7 +81,7 @@ var divtests []optest = []optest{
 	{`(/ 1.0 2 3)`, false, true, nil},
 	{`(/ 1 2.1 3.0)`, false, true, nil},
 	{`(/ 1 0.0)`, false, true, nil},
-	{`(/ true 1)`, false, false, int64(1)},
+	{`(/ true 1)`, false, false, parser.SInt(1)},
 	{`(/ 1 false)`, false, true, nil},
 	{`(/ true false)`, false, true, nil},
 	{`(/ true "true")`, false, true, nil},
@@ -89,14 +89,14 @@ var divtests []optest = []optest{
 }
 
 var remtests []optest = []optest{
-	{`(rem 1 2)`, false, false, int64(1)},
+	{`(rem 1 2)`, false, false, parser.SInt(1)},
 	{`(rem 1 0)`, false, true, nil},
-	{`(rem 1 2 3)`, false, false, (int64(1) % int64(2)) % int64(3)},
+	{`(rem 1 2 3)`, false, false, (parser.SInt(1) % parser.SInt(2)) % parser.SInt(3)},
 	{`(rem 1.0 2)`, false, true, nil},
 	{`(rem 1 2.0)`, false, true, nil},
 	{`(rem "1" 2)`, false, true, nil},
 	{`(rem 1 "2")`, false, true, nil},
-	{`(rem true 1)`, false, false, int64(0)},
+	{`(rem true 1)`, false, false, parser.SInt(0)},
 	{`(rem 1 false)`, false, true, nil},
 	{`(rem true false)`, false, true, nil},
 	{`(rem true "true")`, false, true, nil},
@@ -105,15 +105,15 @@ var remtests []optest = []optest{
 }
 
 var eqtests []optest = []optest{
-	{`(eq 1 1)`, false, false, int64(1)},
-	{`(eq 2 1)`, false, false, int64(0)},
-	{`(eq 1.0 1.0)`, false, false, int64(1)},
-	{`(eq 2.0 1.0)`, false, false, int64(0)},
-	{`(eq "abc" "abc")`, false, false, int64(1)},
-	{`(eq "abc" "123")`, false, false, int64(0)},
+	{`(eq 1 1)`, false, false, parser.SInt(1)},
+	{`(eq 2 1)`, false, false, parser.SInt(0)},
+	{`(eq 1.0 1.0)`, false, false, parser.SInt(1)},
+	{`(eq 2.0 1.0)`, false, false, parser.SInt(0)},
+	{`(eq "abc" "abc")`, false, false, parser.SInt(1)},
+	{`(eq "abc" "123")`, false, false, parser.SInt(0)},
 	{`(eq 1 1.0)`, false, true, nil},
 	{`(eq 1 "1")`, false, true, nil},
-	{`(eq 1 true)`, false, false, int64(1)},
+	{`(eq 1 true)`, false, false, parser.SInt(1)},
 	{`(eq 1)`, false, true, false},
 }
 
@@ -182,30 +182,30 @@ var gtetests []optest = []optest{
 }
 
 var strtests = []optest{
-	{`(str 1)`, false, false, fmt.Sprint(int64(1))},
-	{`(str -10)`, false, false, fmt.Sprint(int64(-10))},
+	{`(str 1)`, false, false, fmt.Sprint(parser.SInt(1))},
+	{`(str -10)`, false, false, fmt.Sprint(parser.SInt(-10))},
 	{`(str 1.0)`, false, false, fmt.Sprint(float64(1.0))},
 	{`(str 3.1415926535)`, false, false, fmt.Sprint(float64(3.1415926535))},
-	{`(str true)`, false, false, fmt.Sprint(int64(1))},
-	{`(str false)`, false, false, fmt.Sprint(int64(0))},
+	{`(str true)`, false, false, fmt.Sprint(parser.SInt(1))},
+	{`(str false)`, false, false, fmt.Sprint(parser.SInt(0))},
 }
 
 var inttests = []optest{
-	{`(int 10)`, false, false, int64(10)},
-	{`(int 10.0)`, false, false, int64(10.0)},
-	{`(int "10")`, false, false, int64(10)},
+	{`(int 10)`, false, false, parser.SInt(10)},
+	{`(int 10.0)`, false, false, parser.SInt(10.0)},
+	{`(int "10")`, false, false, parser.SInt(10)},
 	{`(int "10.0")`, false, true, nil},
-	{`(int true)`, false, false, int64(1)},
-	{`(int false)`, false, false, int64(0)},
+	{`(int true)`, false, false, parser.SInt(1)},
+	{`(int false)`, false, false, parser.SInt(0)},
 }
 
 var floattests = []optest{
-	{`(float 10)`, false, false, float64(int64(10))},
+	{`(float 10)`, false, false, float64(parser.SInt(10))},
 	{`(float 10.0)`, false, false, float64(10.0)},
 	{`(float "10")`, false, false, float64(10)},
 	{`(float "10.0")`, false, false, float64(10)},
-	{`(float true)`, false, false, float64(int64(1))},
-	{`(float false)`, false, false, float64(int64(0))},
+	{`(float true)`, false, false, float64(parser.SInt(1))},
+	{`(float false)`, false, false, float64(parser.SInt(0))},
 }
 
 func doOpTests(name string, t *testing.T, tests []optest) {
@@ -226,8 +226,8 @@ func doOpTests(name string, t *testing.T, tests []optest) {
 				}
 			} else {
 				success := false
-				if ir, ok := result.(int64); ok {
-					if ie, ok := tst.expected.(int64); ok && ir == ie {
+				if ir, ok := result.(parser.SInt); ok {
+					if ie, ok := tst.expected.(parser.SInt); ok && ir == ie {
 						success = true
 					}
 				} else if fr, ok := result.(float64); ok {

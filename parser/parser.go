@@ -65,7 +65,7 @@ func Parse(filename string, st *SymbolTable, src io.Reader) ([]*List, error) {
 			// IntかFloatとして処理できるか先に確認し、どちらもダメならシンボルにする。
 			vi, err := strconv.ParseInt(toktxt, 0, 64)
 			if err == nil {
-				lst.elements = append(lst.elements, newLiteral(vi, filename, line, column))
+				lst.elements = append(lst.elements, newLiteral(SInt(vi), filename, line, column))
 			} else {
 				vf, err := strconv.ParseFloat(toktxt, 64)
 				if err == nil {

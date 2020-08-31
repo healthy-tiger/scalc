@@ -45,13 +45,13 @@ func (f *Function) EvalAsNative(lst *parser.List, ns *Namespace) (interface{}, e
 	return f.native(f.nativeparam, lst, ns)
 }
 
-// EvalAsInt 名前空間nsでelmを評価し、その結果をint64として返す。int64でない結果の場合はエラーを返す。
-func EvalAsInt(elm parser.SyntaxElement, ns *Namespace) (int64, error) {
+// EvalAsInt 名前空間nsでelmを評価し、その結果をparser.SIntとして返す。parser.SIntでない結果の場合はエラーを返す。
+func EvalAsInt(elm parser.SyntaxElement, ns *Namespace) (parser.SInt, error) {
 	r, err := EvalElement(elm, ns)
 	if err != nil {
 		return -1, err
 	}
-	c, ok := r.(int64)
+	c, ok := r.(parser.SInt)
 	if ok {
 		return c, nil
 	}

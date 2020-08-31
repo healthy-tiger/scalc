@@ -1,10 +1,18 @@
 package parser
 
+import (
+	"fmt"
+	"reflect"
+)
+
+// SInt 整数型
+type SInt int64
+
 // SyntaxElement 構文要素を表す。
 type SyntaxElement interface {
 	Position() Position
 	IsList() bool
-	IntValue() (int64, bool)
+	IntValue() (SInt, bool)
 	FloatValue() (float64, bool)
 	StringValue() (string, bool)
 	SymbolValue() (SymbolID, bool)
@@ -55,7 +63,7 @@ func (lst *List) IsList() bool {
 }
 
 // IntValue lstは整数型の値を持たない。
-func (lst *List) IntValue() (int64, bool) {
+func (lst *List) IntValue() (SInt, bool) {
 	return 0, false
 }
 
@@ -83,7 +91,7 @@ func (lst *List) ElementAt(index int) SyntaxElement {
 }
 
 // IntAt lstのindex番目の要素がint64ならその値を返す。
-func (lst *List) IntAt(index int) (int64, bool) {
+func (lst *List) IntAt(index int) (SInt, bool) {
 	se := lst.ElementAt(index)
 	if se != nil {
 		return se.IntValue()
@@ -109,7 +117,7 @@ func (lst *List) StringAt(index int) (string, bool) {
 	return "", false
 }
 
-// SymbolAt lstのindex番目の要素がint64ならその値を返す。
+// SymbolAt lstのindex番目の要素がSIntならその値を返す。
 func (lst *List) SymbolAt(index int) (SymbolID, bool) {
 	se := lst.ElementAt(index)
 	if se != nil {
@@ -120,7 +128,7 @@ func (lst *List) SymbolAt(index int) (SymbolID, bool) {
 
 func newLiteral(value interface{}, filename string, line int, column int) *element {
 	switch value.(type) {
-	case int64:
+	case SInt:
 		return &element{value, Position{filename, line, column}}
 	case float64:
 		return &element{value, Position{filename, line, column}}
@@ -129,7 +137,7 @@ func newLiteral(value interface{}, filename string, line int, column int) *eleme
 	case string:
 		return &element{value, Position{filename, line, column}}
 	}
-	panic("Unexpected value type")
+	panic(fmt.Sprintf("Unexpected value type: %v", reflect.TypeOf(value)))
 }
 
 // IsList eがリストならtrueを返す。
@@ -142,9 +150,9 @@ func (e *element) Position() Position {
 	return e.pos
 }
 
-// IntValue eが整数リテラルなら、整数リテラルのint64型の値を返す。
-func (e *element) IntValue() (int64, bool) {
-	v, ok := e.value.(int64)
+// IntValue eが整数リテラルなら、整数リテラルのSInt型の値を返す。
+func (e *element) IntValue() (SInt, bool) {
+	v, ok := e.value.(SInt)
 	return v, ok
 }
 
