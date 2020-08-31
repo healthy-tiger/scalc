@@ -25,10 +25,10 @@ func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		params[i] = ev
 	}
 
-	v, ok := params[1].(parser.SInt)
+	v, ok := params[1].(int64)
 	if ok {
 		for i := 2; i < lst.Len(); i++ {
-			if iv, ok := params[i].(parser.SInt); ok {
+			if iv, ok := params[i].(int64); ok {
 				if iv == 0 {
 					return nil, newEvalError(lst.ElementAt(i).Position(), ErrorDivisionByZero)
 				}

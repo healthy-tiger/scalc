@@ -5,24 +5,15 @@ import (
 	"reflect"
 )
 
-// SInt 整数型
-type SInt int64
-
 // SyntaxElement 構文要素を表す。
 type SyntaxElement interface {
 	Position() Position
 	IsList() bool
-	IntValue() (SInt, bool)
+	IntValue() (int64, bool)
 	FloatValue() (float64, bool)
 	StringValue() (string, bool)
 	SymbolValue() (SymbolID, bool)
 	ElementAt(int) SyntaxElement
-}
-
-// element 値は*ListかSymbolIDかIntかFloatかStringのいずれか
-type element struct {
-	value interface{}
-	pos   Position
 }
 
 // List ListまたはValueを0個以上含む
@@ -37,6 +28,10 @@ type SymbolID int
 
 // InvalidSymbolID 無効なシンボルID
 const InvalidSymbolID = -1
+
+const nilInt = 0
+const nilFloat = 0.0
+const emptyString = ""
 
 func (lst *List) isMatchingParen(close rune) bool {
 	if (lst.openchar == leftParenthesis && close == rightParenthesis) ||
@@ -63,7 +58,7 @@ func (lst *List) IsList() bool {
 }
 
 // IntValue lstは整数型の値を持たない。
-func (lst *List) IntValue() (SInt, bool) {
+func (lst *List) IntValue() (int64, bool) {
 	return 0, false
 }
 
@@ -91,7 +86,7 @@ func (lst *List) ElementAt(index int) SyntaxElement {
 }
 
 // IntAt lstのindex番目の要素がint64ならその値を返す。
-func (lst *List) IntAt(index int) (SInt, bool) {
+func (lst *List) IntAt(index int) (int64, bool) {
 	se := lst.ElementAt(index)
 	if se != nil {
 		return se.IntValue()
@@ -117,7 +112,7 @@ func (lst *List) StringAt(index int) (string, bool) {
 	return "", false
 }
 
-// SymbolAt lstのindex番目の要素がSIntならその値を返す。
+// SymbolAt lstのindex番目の要素がint64ならその値を返す。
 func (lst *List) SymbolAt(index int) (SymbolID, bool) {
 	se := lst.ElementAt(index)
 	if se != nil {
@@ -126,54 +121,172 @@ func (lst *List) SymbolAt(index int) (SymbolID, bool) {
 	return InvalidSymbolID, false
 }
 
-func newLiteral(value interface{}, filename string, line int, column int) *element {
-	switch value.(type) {
-	case SInt:
-		return &element{value, Position{filename, line, column}}
+func newLiteral(value interface{}, filename string, line int, column int) SyntaxElement {
+	switch v := value.(type) {
+	case int64:
+		return &intElement{v, Position{filename, line, column}}
 	case float64:
-		return &element{value, Position{filename, line, column}}
+		return &floatElement{v, Position{filename, line, column}}
 	case SymbolID:
-		return &element{value, Position{filename, line, column}}
+		return &symbolIDElement{v, Position{filename, line, column}}
 	case string:
-		return &element{value, Position{filename, line, column}}
+		return &stringElement{v, Position{filename, line, column}}
 	}
 	panic(fmt.Sprintf("Unexpected value type: %v", reflect.TypeOf(value)))
 }
 
+type intElement struct {
+	value int64
+	pos   Position
+}
+
 // IsList eがリストならtrueを返す。
-func (e *element) IsList() bool {
+func (e *intElement) IsList() bool {
 	return false
 }
 
 // Position eのソースコード上の位置を返す。
-func (e *element) Position() Position {
+func (e *intElement) Position() Position {
 	return e.pos
 }
 
-// IntValue eが整数リテラルなら、整数リテラルのSInt型の値を返す。
-func (e *element) IntValue() (SInt, bool) {
-	v, ok := e.value.(SInt)
-	return v, ok
+// IntValue eが整数リテラルなら、整数リテラルのint64型の値を返す。
+func (e *intElement) IntValue() (int64, bool) {
+	return e.value, true
 }
 
 // FloatValue eが浮動小数点数リテラルなら、浮動小数点数リテラルのfloat64の値を返す。
-func (e *element) FloatValue() (float64, bool) {
-	v, ok := e.value.(float64)
-	return v, ok
+func (e *intElement) FloatValue() (float64, bool) {
+	return nilFloat, false
 }
 
 // StringValue eが文字列リテラルなら、文字列リテラルのstringの値を返す。
-func (e *element) StringValue() (string, bool) {
-	v, ok := e.value.(string)
-	return v, ok
+func (e *intElement) StringValue() (string, bool) {
+	return emptyString, false
 }
 
 // SymbolValue eがシンボルなら、リテラルのSymbolIDを返す。
-func (e *element) SymbolValue() (SymbolID, bool) {
-	v, ok := e.value.(SymbolID)
-	return v, ok
+func (e *intElement) SymbolValue() (SymbolID, bool) {
+	return InvalidSymbolID, false
 }
 
-func (e *element) ElementAt(_ int) SyntaxElement {
+func (e *intElement) ElementAt(_ int) SyntaxElement {
+	return nil
+}
+
+type floatElement struct {
+	value float64
+	pos   Position
+}
+
+// IsList eがリストならtrueを返す。
+func (e *floatElement) IsList() bool {
+	return false
+}
+
+// Position eのソースコード上の位置を返す。
+func (e *floatElement) Position() Position {
+	return e.pos
+}
+
+// IntValue eが整数リテラルなら、整数リテラルのint64型の値を返す。
+func (e *floatElement) IntValue() (int64, bool) {
+	return nilInt, false
+}
+
+// FloatValue eが浮動小数点数リテラルなら、浮動小数点数リテラルのfloat64の値を返す。
+func (e *floatElement) FloatValue() (float64, bool) {
+	return e.value, true
+}
+
+// StringValue eが文字列リテラルなら、文字列リテラルのstringの値を返す。
+func (e *floatElement) StringValue() (string, bool) {
+	return emptyString, false
+}
+
+// SymbolValue eがシンボルなら、リテラルのSymbolIDを返す。
+func (e *floatElement) SymbolValue() (SymbolID, bool) {
+	return InvalidSymbolID, false
+}
+
+func (e *floatElement) ElementAt(_ int) SyntaxElement {
+	return nil
+}
+
+type stringElement struct {
+	value string
+	pos   Position
+}
+
+// IsList eがリストならtrueを返す。
+func (e *stringElement) IsList() bool {
+	return false
+}
+
+// Position eのソースコード上の位置を返す。
+func (e *stringElement) Position() Position {
+	return e.pos
+}
+
+// IntValue eが整数リテラルなら、整数リテラルのint64型の値を返す。
+func (e *stringElement) IntValue() (int64, bool) {
+	return nilInt, false
+}
+
+// FloatValue eが浮動小数点数リテラルなら、浮動小数点数リテラルのfloat64の値を返す。
+func (e *stringElement) FloatValue() (float64, bool) {
+	return nilFloat, false
+}
+
+// StringValue eが文字列リテラルなら、文字列リテラルのstringの値を返す。
+func (e *stringElement) StringValue() (string, bool) {
+	return e.value, true
+}
+
+// SymbolValue eがシンボルなら、リテラルのSymbolIDを返す。
+func (e *stringElement) SymbolValue() (SymbolID, bool) {
+	return InvalidSymbolID, false
+}
+
+func (e *stringElement) ElementAt(_ int) SyntaxElement {
+	return nil
+}
+
+type symbolIDElement struct {
+	value SymbolID
+	pos   Position
+}
+
+// IsList eがリストならtrueを返す。
+func (e *symbolIDElement) IsList() bool {
+	return false
+}
+
+// Position eのソースコード上の位置を返す。
+func (e *symbolIDElement) Position() Position {
+	return e.pos
+}
+
+// IntValue eが整数リテラルなら、整数リテラルのint64型の値を返す。
+func (e *symbolIDElement) IntValue() (int64, bool) {
+	return nilInt, false
+}
+
+// FloatValue eが浮動小数点数リテラルなら、浮動小数点数リテラルのfloat64の値を返す。
+func (e *symbolIDElement) FloatValue() (float64, bool) {
+	return nilFloat, false
+}
+
+// StringValue eが文字列リテラルなら、文字列リテラルのstringの値を返す。
+func (e *symbolIDElement) StringValue() (string, bool) {
+	return emptyString, false
+}
+
+// SymbolValue eがシンボルなら、リテラルのSymbolIDを返す。
+func (e *symbolIDElement) SymbolValue() (SymbolID, bool) {
+	return e.value, true
+}
+
+func (e *symbolIDElement) ElementAt(_ int) SyntaxElement {
 	return nil
 }

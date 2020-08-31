@@ -35,11 +35,11 @@ func dateBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 		params[i] = ev
 	}
 
-	year, ok := params[1].(parser.SInt)
+	year, ok := params[1].(int64)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[1])
 	}
-	month, ok := params[2].(parser.SInt)
+	month, ok := params[2].(int64)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(1).Position(), ErrorOperantsMustBeOfIntegerType, params[2])
 	}
@@ -47,23 +47,23 @@ func dateBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorValueOutOfRange, month, 1, 12)
 	}
 
-	day, ok := params[3].(parser.SInt)
+	day, ok := params[3].(int64)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(3).Position(), ErrorOperantsMustBeOfIntegerType, params[3])
 	}
-	hour, ok := params[4].(parser.SInt)
+	hour, ok := params[4].(int64)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(4).Position(), ErrorOperantsMustBeOfIntegerType, params[4])
 	}
-	min, ok := params[5].(parser.SInt)
+	min, ok := params[5].(int64)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(5).Position(), ErrorOperantsMustBeOfIntegerType, params[5])
 	}
-	sec, ok := params[6].(parser.SInt)
+	sec, ok := params[6].(int64)
 	if !ok {
 		return nil, newEvalError(lst.ElementAt(6).Position(), ErrorOperantsMustBeOfIntegerType, params[6])
 	}
-	nanosec := parser.SInt(0)
+	nanosec := int64(0)
 
 	return time.Date(int(year), time.Month(month), int(day), int(hour), int(min), int(sec), int(nanosec), time.Local).Unix(), nil
 }
@@ -83,7 +83,7 @@ func dayBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	return parser.SInt(time.Unix(int64(sec), int64(0)).Day()), nil
+	return int64(time.Unix(sec, 0).Day()), nil
 }
 
 func hourBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -94,7 +94,7 @@ func hourBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 	if err != nil {
 		return nil, err
 	}
-	return parser.SInt(time.Unix(int64(sec), int64(0)).Hour()), nil
+	return int64(time.Unix(sec, 0).Hour()), nil
 }
 
 func minuteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -105,7 +105,7 @@ func minuteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 	if err != nil {
 		return nil, err
 	}
-	return parser.SInt(time.Unix(int64(sec), int64(0)).Minute()), nil
+	return int64(time.Unix(sec, 0).Minute()), nil
 }
 
 func monthBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -116,7 +116,7 @@ func monthBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 	if err != nil {
 		return nil, err
 	}
-	return parser.SInt(time.Unix(int64(sec), int64(0)).Month()), nil
+	return int64(time.Unix(sec, 0).Month()), nil
 }
 
 func secondBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -127,7 +127,7 @@ func secondBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 	if err != nil {
 		return nil, err
 	}
-	return parser.SInt(time.Unix(int64(sec), int64(0)).Second()), nil
+	return int64(time.Unix(sec, 0).Second()), nil
 }
 
 func weekdayBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -138,7 +138,7 @@ func weekdayBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, e
 	if err != nil {
 		return nil, err
 	}
-	return parser.SInt(time.Unix(int64(sec), int64(0)).Weekday()), nil
+	return int64(time.Unix(sec, 0).Weekday()), nil
 }
 
 func yearBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -149,7 +149,7 @@ func yearBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 	if err != nil {
 		return nil, err
 	}
-	return parser.SInt(time.Unix(int64(sec), int64(0)).Year()), nil
+	return int64(time.Unix(sec, 0).Year()), nil
 }
 
 func yeardayBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -160,7 +160,7 @@ func yeardayBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, e
 	if err != nil {
 		return nil, err
 	}
-	return parser.SInt(time.Unix(int64(sec), int64(0)).YearDay()), nil
+	return int64(time.Unix(sec, 0).YearDay()), nil
 
 }
 
@@ -172,7 +172,7 @@ func zoneBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 	if err != nil {
 		return nil, err
 	}
-	t := time.Unix(int64(sec), int64(0))
+	t := time.Unix(sec, 0)
 	z, _ := t.Zone()
 	return z, nil
 }
@@ -185,9 +185,9 @@ func zoneoffsetBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}
 	if err != nil {
 		return nil, err
 	}
-	t := time.Unix(int64(sec), int64(0))
+	t := time.Unix(sec, 0)
 	_, o := t.Zone()
-	return parser.SInt(o), nil
+	return int64(o), nil
 }
 
 // RegisterTimeFunc 時刻に関する拡張関数を登録する。

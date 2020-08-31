@@ -148,7 +148,7 @@ func TestParse11(t *testing.T) {
 (3 4 5)
 `
 	st := NewSymbolTable()
-	vals := [][]SInt{{1, 2, 3}, {3, 4, 5}}
+	vals := [][]int64{{1, 2, 3}, {3, 4, 5}}
 
 	lists, err := ParseString("TestParse11", st, src)
 	if err != nil {
@@ -180,7 +180,7 @@ func TestParse12(t *testing.T) {
 5)
 `
 	st := NewSymbolTable()
-	vals := [][]SInt{{1, 2, 3}, {3, 4, 5}}
+	vals := [][]int64{{1, 2, 3}, {3, 4, 5}}
 
 	lists, err := ParseString("TestParse12", st, src)
 	if err != nil {

@@ -60,7 +60,7 @@ func ifBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 	if err != nil {
 		return nil, err
 	}
-	if cond, ok := p.(parser.SInt); ok {
+	if cond, ok := p.(int64); ok {
 		if cond != 0 {
 			return EvalElement(lst.ElementAt(2), ns)
 		}
@@ -76,7 +76,7 @@ func whileBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 	condelm := lst.ElementAt(1)
 	bodyelm := lst.ElementAt(2)
 	cond, err := EvalAsInt(condelm, ns)
-	count := parser.SInt(0)
+	count := int64(0)
 	for err == nil && cond != 0 {
 		count++
 		_, err = EvalElement(bodyelm, ns)

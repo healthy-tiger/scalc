@@ -1,6 +1,9 @@
 package runtime
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/healthy-tiger/scalc/parser"
 )
 
@@ -9,7 +12,7 @@ type Namespace struct {
 	symtbl   *parser.SymbolTable // ルートの名前空間の場合のみ非nilになる。
 	root     *Namespace
 	parent   *Namespace
-	bindings map[parser.SymbolID]interface{} // string, parser.SInt, float64, *Functionのいれずれか
+	bindings map[parser.SymbolID]interface{} // string, int64, float64, *Functionのいれずれか
 }
 
 // Get nsからシンボルID idに対応する値を取得する。
@@ -28,10 +31,10 @@ func (ns *Namespace) Get(id parser.SymbolID) (interface{}, bool) {
 // Set nsにシンボルID idに対応する値を格納する。
 func (ns *Namespace) Set(id parser.SymbolID, value interface{}) {
 	switch value.(type) {
-	case parser.SInt, float64, string, *Function:
+	case int64, float64, string, *Function:
 		ns.bindings[id] = value
 	default:
-		panic("Invalid Type of symbol.")
+		panic(fmt.Sprintf("Invalid Type of symbol %v", reflect.TypeOf(value)))
 	}
 }
 

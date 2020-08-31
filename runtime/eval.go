@@ -1,6 +1,9 @@
 package runtime
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/healthy-tiger/scalc/parser"
 )
 
@@ -45,13 +48,13 @@ func (f *Function) EvalAsNative(lst *parser.List, ns *Namespace) (interface{}, e
 	return f.native(f.nativeparam, lst, ns)
 }
 
-// EvalAsInt 名前空間nsでelmを評価し、その結果をparser.SIntとして返す。parser.SIntでない結果の場合はエラーを返す。
-func EvalAsInt(elm parser.SyntaxElement, ns *Namespace) (parser.SInt, error) {
+// EvalAsInt 名前空間nsでelmを評価し、その結果をint64として返す。int64でない結果の場合はエラーを返す。
+func EvalAsInt(elm parser.SyntaxElement, ns *Namespace) (int64, error) {
 	r, err := EvalElement(elm, ns)
 	if err != nil {
 		return -1, err
 	}
-	c, ok := r.(parser.SInt)
+	c, ok := r.(int64)
 	if ok {
 		return c, nil
 	}
@@ -80,7 +83,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 	} else if sf, ok := st.FloatValue(); ok {
 		return sf, nil
 	} else {
-		panic("Illegal syntax tree element")
+		panic(fmt.Sprintf("Illegal syntax tree element %v", reflect.TypeOf(st)))
 	}
 }
 
