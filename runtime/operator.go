@@ -13,6 +13,7 @@ const (
 	subSymbol        = "-"
 	mulSymbol        = "*"
 	divSymbol        = "/"
+	remSymbol        = "%" // 整数同士の剰余
 	bitwiseANDSymbol = "band"
 	bitwiseORSymbol  = "bor"
 	bitwiseXORSymbol = "bxor"
@@ -237,6 +238,25 @@ func divBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 		}
 	}
 	return result, nil
+}
+
+// remBody 整数同士の剰余。整数でない引数が含まれる場合はエラー
+func remBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 3 {
+		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+	}
+
+	a, aerr := EvalAsInt(lst.ElementAt(1), ns)
+	b, berr := EvalAsInt(lst.ElementAt(2), ns)
+	if aerr != nil {
+		return nil, aerr
+	} else if berr != nil {
+		return nil, berr
+	}
+	if b == 0 {
+		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorDivisionByZero)
+	}
+	return a % b, nil
 }
 
 func eqBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -670,6 +690,7 @@ func RegisterOperators(ns *Namespace) {
 	ns.RegisterExtension(subSymbol, nil, subBody)
 	ns.RegisterExtension(mulSymbol, nil, mulBody)
 	ns.RegisterExtension(divSymbol, nil, divBody)
+	ns.RegisterExtension(remSymbol, nil, remBody)
 	ns.RegisterExtension(eqSymbol, nil, eqBody)
 	ns.RegisterExtension(bitwiseANDSymbol, nil, bitwiseANDbody)
 	ns.RegisterExtension(bitwiseORSymbol, nil, bitwiseORbody)
