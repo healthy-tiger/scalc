@@ -38,7 +38,8 @@ type EvalError struct {
 	Message       string
 }
 
-func newEvalError(loc parser.Position, id int, args ...interface{}) *EvalError {
+// NewEvalError 式の評価の際に発生したエラーを表すオブジェクトを生成する。
+func NewEvalError(loc parser.Position, id int, args ...interface{}) *EvalError {
 	msg, ok := errorMessages[id]
 	if !ok {
 		panic("Undefined error id")

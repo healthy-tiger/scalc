@@ -42,7 +42,7 @@ func (f *Function) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 // EvalAsFunction 関数fをユーザー定義関数として、lstの第2要素以降を引数に、グローバルの名前空間globalsで評価し、その結果を返す。
 func (f *Function) EvalAsFunction(lst *parser.List, ns *Namespace) (interface{}, error) {
 	if len(f.params) != lst.Len()-1 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, len(f.params), lst.Len()-1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, len(f.params), lst.Len()-1)
 	}
 	// 呼び出し先（の関数を実行する際）の名前空間を定義。最上位の名前空間以外は呼び出し元と名前空間を共有しない。
 	lns := NewNamespace(ns.Root())
@@ -72,7 +72,7 @@ func EvalAsInt(elm parser.SyntaxElement, ns *Namespace) (int64, error) {
 	if ok {
 		return c, nil
 	}
-	return -1, newEvalError(elm.Position(), ErrorOperantsMustBeOfIntegerType, r)
+	return -1, NewEvalError(elm.Position(), ErrorOperantsMustBeOfIntegerType, r)
 }
 
 // EvalAsFloat 名前空間nsでelmを評価し、その結果をfloat64として返す。float64でない結果の場合はエラーを返す。
@@ -85,7 +85,7 @@ func EvalAsFloat(elm parser.SyntaxElement, ns *Namespace) (float64, error) {
 	if ok {
 		return c, nil
 	}
-	return -1, newEvalError(elm.Position(), ErrorOperantsMustBeOfFloatType, r)
+	return -1, NewEvalError(elm.Position(), ErrorOperantsMustBeOfFloatType, r)
 }
 
 // EvalElement 構文要素を指定された名前空間で評価する。
@@ -100,7 +100,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 			if err != nil {
 				panic(err)
 			}
-			return nil, newEvalError(st.Position(), ErrorUndefinedSymbol, sn)
+			return nil, NewEvalError(st.Position(), ErrorUndefinedSymbol, sn)
 		}
 		return sv, nil
 	} else if ss, ok := st.StringValue(); ok {
@@ -118,7 +118,7 @@ func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 func EvalList(lst *parser.List, ns *Namespace) (interface{}, error) {
 	// 空のリストは評価できないのでエラー(Excentionがリストを評価する場合はExtentionsによる）
 	if lst.Len() == 0 {
-		return nil, newEvalError(lst.Position(), ErrorAnEmptyListIsNotAllowed)
+		return nil, NewEvalError(lst.Position(), ErrorAnEmptyListIsNotAllowed)
 	}
 	// 最初の要素は必ずシンボルで、呼び出し可能なオブジェクト（*FunctionかExtensionにバインドされていなければならない）
 	first := lst.ElementAt(0)
@@ -129,7 +129,7 @@ func EvalList(lst *parser.List, ns *Namespace) (interface{}, error) {
 	if c, ok := funcobj.(*Function); ok {
 		return c.Eval(lst, ns)
 	}
-	return nil, newEvalError(first.Position(), ErrorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject, funcobj)
+	return nil, NewEvalError(first.Position(), ErrorTheFirstElementOfTheListToBeEvaluatedMustBeACallableObject, funcobj)
 }
 
 // MakeDefaultNamespace 予約済みのシンボルをシンボルテーブに登録し、その値を登録済みの名前空間を作る。

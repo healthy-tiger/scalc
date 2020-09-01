@@ -83,7 +83,7 @@ const (
 
 func absBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -94,7 +94,7 @@ func absBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func acosBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -105,7 +105,7 @@ func acosBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func acoshBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -116,7 +116,7 @@ func acoshBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func asinBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -127,7 +127,7 @@ func asinBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func asinhBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -138,7 +138,7 @@ func asinhBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func atanBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -149,7 +149,7 @@ func atanBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func atan2Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -164,7 +164,7 @@ func atan2Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func atanhBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -175,7 +175,7 @@ func atanhBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func cbrtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -186,7 +186,7 @@ func cbrtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func ceilBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -197,7 +197,7 @@ func ceilBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func copysignBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -212,7 +212,7 @@ func copysignBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, 
 
 func cosBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -223,7 +223,7 @@ func cosBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func coshBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -234,7 +234,7 @@ func coshBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func dimBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -249,7 +249,7 @@ func dimBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func erfBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -260,7 +260,7 @@ func erfBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func erfcBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -271,7 +271,7 @@ func erfcBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func erfcinvBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -282,7 +282,7 @@ func erfcinvBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, e
 
 func erfinvBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -293,7 +293,7 @@ func erfinvBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, er
 
 func expBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -304,7 +304,7 @@ func expBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func exp2Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -315,7 +315,7 @@ func exp2Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func expm1Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -326,7 +326,7 @@ func expm1Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func fMABody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 4 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 3)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 3)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -346,7 +346,7 @@ func fMABody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func floorBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -357,7 +357,7 @@ func floorBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func gammaBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -368,7 +368,7 @@ func gammaBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func hypotBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -383,7 +383,7 @@ func hypotBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func ilogbBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -394,7 +394,7 @@ func ilogbBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func infBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsInt(lst.ElementAt(1), ns)
 	if err != nil {
@@ -405,7 +405,7 @@ func infBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func isInfBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsInt(lst.ElementAt(2), ns)
@@ -421,7 +421,7 @@ func isInfBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func isNaNBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -433,7 +433,7 @@ func isNaNBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func j0Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -444,7 +444,7 @@ func j0Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 
 func j1Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, err := EvalAsFloat(lst.ElementAt(1), ns)
 	if err != nil {
@@ -455,7 +455,7 @@ func j1Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 
 func jnBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsInt(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -470,7 +470,7 @@ func jnBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 
 func ldexpBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsInt(lst.ElementAt(2), ns)
@@ -485,7 +485,7 @@ func ldexpBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func logBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -496,7 +496,7 @@ func logBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func log10Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -507,7 +507,7 @@ func log10Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func log1pBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -518,7 +518,7 @@ func log1pBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func log2Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -529,7 +529,7 @@ func log2Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func logbBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -540,7 +540,7 @@ func logbBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func maxBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -555,7 +555,7 @@ func maxBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func minBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -570,7 +570,7 @@ func minBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func modBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -585,14 +585,14 @@ func modBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func naNBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 1 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 0)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 0)
 	}
 	return math.NaN(), nil
 }
 
 func nextafterBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -607,7 +607,7 @@ func nextafterBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{},
 
 func powBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -622,7 +622,7 @@ func powBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func pow10Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsInt(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -633,7 +633,7 @@ func pow10Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func remainderBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(2), ns)
@@ -648,7 +648,7 @@ func remainderBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{},
 
 func roundBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -659,7 +659,7 @@ func roundBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func roundToEvenBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -670,7 +670,7 @@ func roundToEvenBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{
 
 func signbitBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -682,7 +682,7 @@ func signbitBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, e
 
 func sinBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -693,7 +693,7 @@ func sinBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func sinhBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -704,7 +704,7 @@ func sinhBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func sqrtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -715,7 +715,7 @@ func sqrtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func tanBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -726,7 +726,7 @@ func tanBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 
 func tanhBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -737,7 +737,7 @@ func tanhBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, erro
 
 func truncBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -748,7 +748,7 @@ func truncBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 
 func y0Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -759,7 +759,7 @@ func y0Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 
 func y1Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 2 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
 	}
 	a, aerr := EvalAsFloat(lst.ElementAt(1), ns)
 	if aerr != nil {
@@ -770,7 +770,7 @@ func y1Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 
 func ynBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
 	if lst.Len() != 3 {
-		return nil, newEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
 	}
 	a, aerr := EvalAsInt(lst.ElementAt(1), ns)
 	b, berr := EvalAsFloat(lst.ElementAt(1), ns)
