@@ -89,19 +89,19 @@ var divtests []optest = []optest{
 }
 
 var remtests []optest = []optest{
-	{`(rem 1 2)`, false, false, int64(1)},
-	{`(rem 1 0)`, false, true, nil},
-	{`(rem 1 2 3)`, false, false, (int64(1) % int64(2)) % int64(3)},
-	{`(rem 1.0 2)`, false, true, nil},
-	{`(rem 1 2.0)`, false, true, nil},
-	{`(rem "1" 2)`, false, true, nil},
-	{`(rem 1 "2")`, false, true, nil},
-	{`(rem true 1)`, false, false, int64(0)},
-	{`(rem 1 false)`, false, true, nil},
-	{`(rem true false)`, false, true, nil},
-	{`(rem true "true")`, false, true, nil},
-	{`(rem 1)`, false, true, nil},
-	{`(rem)`, false, true, nil},
+	{`(% 1 2)`, false, false, int64(1)},
+	{`(% 1 0)`, false, true, nil},
+	{`(% 1 2 3)`, false, true, nil},
+	{`(% 1.0 2)`, false, true, nil},
+	{`(% 1 2.0)`, false, true, nil},
+	{`(% "1" 2)`, false, true, nil},
+	{`(% 1 "2")`, false, true, nil},
+	{`(% true 1)`, false, false, int64(0)},
+	{`(% 1 false)`, false, true, nil},
+	{`(% true false)`, false, true, nil},
+	{`(% true "true")`, false, true, nil},
+	{`(% 1)`, false, true, nil},
+	{`(%)`, false, true, nil},
 }
 
 var eqtests []optest = []optest{
