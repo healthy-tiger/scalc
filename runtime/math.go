@@ -7,6 +7,20 @@ import (
 )
 
 const (
+	eSymbol       = "E"
+	piSymbol      = "Pi"
+	phiSymbol     = "Phi"
+	sqrt2Symbol   = "Sqrt2"
+	sqrtESymbol   = "SqrtE"
+	sqrtPiSymbol  = "SqrtPi"
+	sqrtPhiSymbol = "SqrtPhi"
+	ln2Symbol     = "Ln2"
+	log2ESymbol   = "Log2E"
+	ln10Symbol    = "Ln10"
+	log10ESymbol  = "Log10E"
+)
+
+const (
 	absSymbol         = "abs"
 	acosSymbol        = "acos"
 	acoshSymbol       = "acosh"
@@ -771,6 +785,17 @@ func ynBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 
 // RegisterMath stに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterMath(ns *Namespace) {
+	ns.Set(ns.GetSymbolID(eSymbol), float64(math.E))
+	ns.Set(ns.GetSymbolID(piSymbol), float64(math.Pi))
+	ns.Set(ns.GetSymbolID(phiSymbol), float64(math.Phi))
+	ns.Set(ns.GetSymbolID(sqrt2Symbol), float64(math.Sqrt2))
+	ns.Set(ns.GetSymbolID(sqrtESymbol), float64(math.SqrtE))
+	ns.Set(ns.GetSymbolID(sqrtPiSymbol), float64(math.SqrtPi))
+	ns.Set(ns.GetSymbolID(sqrtPhiSymbol), float64(math.SqrtPhi))
+	ns.Set(ns.GetSymbolID(ln2Symbol), float64(math.Ln2))
+	ns.Set(ns.GetSymbolID(log2ESymbol), float64(math.Log2E))
+	ns.Set(ns.GetSymbolID(ln10Symbol), float64(math.Ln10))
+	ns.Set(ns.GetSymbolID(log10ESymbol), float64(math.Log10E))
 	ns.RegisterExtension(absSymbol, nil, absBody)
 	ns.RegisterExtension(absSymbol, nil, absBody)
 	ns.RegisterExtension(acosSymbol, nil, acosBody)
