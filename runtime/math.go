@@ -416,7 +416,7 @@ func isInfBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 		return 0, berr
 	}
 	r := math.IsInf(a, int(b))
-	return boolToInt(r), nil
+	return BoolToInt(r), nil
 }
 
 func isNaNBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -428,7 +428,7 @@ func isNaNBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 		return math.NaN(), err
 	}
 	r := math.IsNaN(a)
-	return boolToInt(r), nil
+	return BoolToInt(r), nil
 }
 
 func j0Body(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
@@ -677,7 +677,7 @@ func signbitBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, e
 		return math.NaN(), aerr
 	}
 	r := math.Signbit(a)
-	return boolToInt(r), nil
+	return BoolToInt(r), nil
 }
 
 func sinBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {

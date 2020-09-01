@@ -24,13 +24,6 @@ func isValidType(v interface{}) bool {
 	}
 }
 
-func boolToInt(b bool) int64 {
-	if b {
-		return 1
-	}
-	return 0
-}
-
 // Eval 関数fをlstの第2要素以降を引数に、グローバルの名前空間globalsで評価し、その結果を返す。
 func (f *Function) Eval(lst *parser.List, ns *Namespace) (interface{}, error) {
 	if f.body != nil && f.params != nil {

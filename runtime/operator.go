@@ -449,12 +449,12 @@ func ltBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 	switch a := pa.(type) {
 	case int64:
 		if b, ok := pb.(int64); ok {
-			return boolToInt(a < b), nil
+			return BoolToInt(a < b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	case float64:
 		if b, ok := pb.(float64); ok {
-			return boolToInt(a < b), nil
+			return BoolToInt(a < b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	default:
@@ -479,12 +479,12 @@ func lteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	switch a := pa.(type) {
 	case int64:
 		if b, ok := pb.(int64); ok {
-			return boolToInt(a <= b), nil
+			return BoolToInt(a <= b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	case float64:
 		if b, ok := pb.(float64); ok {
-			return boolToInt(a <= b), nil
+			return BoolToInt(a <= b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	default:
@@ -509,12 +509,12 @@ func gtBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error)
 	switch a := pa.(type) {
 	case int64:
 		if b, ok := pb.(int64); ok {
-			return boolToInt(a > b), nil
+			return BoolToInt(a > b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	case float64:
 		if b, ok := pb.(float64); ok {
-			return boolToInt(a > b), nil
+			return BoolToInt(a > b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, a, pb)
 	default:
@@ -539,12 +539,12 @@ func gteBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error
 	switch a := pa.(type) {
 	case int64:
 		if b, ok := pb.(int64); ok {
-			return boolToInt(a >= b), nil
+			return BoolToInt(a >= b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	case float64:
 		if b, ok := pb.(float64); ok {
-			return boolToInt(a >= b), nil
+			return BoolToInt(a >= b), nil
 		}
 		return nil, newEvalError(lst.ElementAt(2).Position(), ErrorTypeMissmatch, reflect.TypeOf(a), reflect.TypeOf(pb))
 	default:
