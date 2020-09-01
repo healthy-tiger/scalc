@@ -100,7 +100,8 @@ func printBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 		}
 		params[i-1] = v
 	}
-	return fmt.Println(params...)
+	np, err := fmt.Println(params...)
+	return int64(np), err
 }
 
 func beginBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
