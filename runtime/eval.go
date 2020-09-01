@@ -82,6 +82,19 @@ func EvalAsInt(elm parser.SyntaxElement, ns *Namespace) (int64, error) {
 	return -1, newEvalError(elm.Position(), ErrorOperantsMustBeOfIntegerType, r)
 }
 
+// EvalAsFloat 名前空間nsでelmを評価し、その結果をfloat64として返す。float64でない結果の場合はエラーを返す。
+func EvalAsFloat(elm parser.SyntaxElement, ns *Namespace) (float64, error) {
+	r, err := EvalElement(elm, ns)
+	if err != nil {
+		return -1, err
+	}
+	c, ok := r.(float64)
+	if ok {
+		return c, nil
+	}
+	return -1, newEvalError(elm.Position(), ErrorOperantsMustBeOfFloatType, r)
+}
+
 // EvalElement 構文要素を指定された名前空間で評価する。
 func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 	if st.IsList() {
