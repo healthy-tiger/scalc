@@ -1,12 +1,15 @@
 package runtime
 
 import (
+	"strings"
+
 	"github.com/healthy-tiger/scalc/parser"
 )
 
 const (
 	strCmpSymbol        = "strcmp"
 	strCmpNaturalSymbol = "strcmp-natural"
+	containsSymbol      = "contains"
 )
 
 func toNaturalString(s string) []rune {
@@ -93,8 +96,24 @@ func strCmpNaturalBody(_ interface{}, lst *parser.List, ns *Namespace) (interfac
 	return int64(compareRunes(an, bn)), nil
 }
 
+func containsBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 3 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	b, berr := EvalAsString(lst.ElementAt(2), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	if berr != nil {
+		return nil, berr
+	}
+	return BoolToInt(strings.Contains(a, b)), nil
+}
+
 // RegisterStrings stに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterStrings(ns *Namespace) {
 	ns.RegisterExtension(strCmpSymbol, nil, strCmpBody)
 	ns.RegisterExtension(strCmpNaturalSymbol, nil, strCmpNaturalBody)
+	ns.RegisterExtension(containsSymbol, nil, containsBody)
 }
