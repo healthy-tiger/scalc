@@ -38,6 +38,7 @@ var (
 	ErrorOperantsMustBeNumeric          int
 	ErrorOperantsMustBeOfIntegerType    int
 	ErrorOperantsMustBeOfFloatType      int
+	ErrorOperantsMustBeOfStringType     int
 	ErrorDivisionByZero                 int
 	ErrorAllOperantsMustBeOfTheSameType int
 	ErrorNonArithmeticDataType          int
@@ -48,6 +49,7 @@ func init() {
 	ErrorOperantsMustBeNumeric = RegisterEvalError("Operants must be numeric: %v")
 	ErrorOperantsMustBeOfIntegerType = RegisterEvalError("Operants must be of integer type: %v")
 	ErrorOperantsMustBeOfFloatType = RegisterEvalError("Operants must be of float type: %v")
+	ErrorOperantsMustBeOfStringType = RegisterEvalError("Operants must be of string type: %v")
 	ErrorDivisionByZero = RegisterEvalError("Division by zero")
 	ErrorAllOperantsMustBeOfTheSameType = RegisterEvalError("All operants must be of the same type")
 	ErrorNonArithmeticDataType = RegisterEvalError("Non-arithmetic data type: '%v)")

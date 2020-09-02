@@ -88,6 +88,19 @@ func EvalAsFloat(elm parser.SyntaxElement, ns *Namespace) (float64, error) {
 	return -1, NewEvalError(elm.Position(), ErrorOperantsMustBeOfFloatType, r)
 }
 
+// EvalAsString 名前空間nsでelmを評価し、その結果をstringとして返す。stringでない結果の場合はエラーを返す。
+func EvalAsString(elm parser.SyntaxElement, ns *Namespace) (string, error) {
+	r, err := EvalElement(elm, ns)
+	if err != nil {
+		return "", err
+	}
+	c, ok := r.(string)
+	if ok {
+		return c, nil
+	}
+	return "", NewEvalError(elm.Position(), ErrorOperantsMustBeOfStringType, r)
+}
+
 // EvalElement 構文要素を指定された名前空間で評価する。
 func EvalElement(st parser.SyntaxElement, ns *Namespace) (interface{}, error) {
 	if st.IsList() {
@@ -139,4 +152,5 @@ func MakeDefaultNamespace(ns *Namespace) {
 	RegisterMath(ns)
 	RegisterStmt(ns)
 	RegisterTimeFunc(ns)
+	RegisterStrings(ns)
 }
