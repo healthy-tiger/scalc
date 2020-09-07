@@ -21,6 +21,16 @@ const (
 	lastIndexAnySymbol  = "str-lastindex-any"
 	repeatSymbol        = "str-repeat"
 	replaceSymbol       = "str-replace"
+	titleSymbol         = "str-title"
+	toLowerSymbol       = "str-to-lower"
+	toTitleSymbol       = "str-to-title"
+	toUpperSymbol       = "str-to-upper"
+	trimSymbol          = "str-trim"
+	trimLeftSymbol      = "str-trim-left"
+	trimPrefixSymbol    = "str-trim-prefix"
+	trimRightSymbol     = "str-trim-right"
+	trimSpaceSymbol     = "str-trim-space"
+	trimSuffixSymbol    = "str-trim-suffix"
 )
 
 func toNaturalString(s string) []rune {
@@ -330,6 +340,136 @@ func replaceBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, e
 	}
 }
 
+func titleBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 2 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	return strings.Title(a), nil
+}
+
+func toLowerBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 2 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	return strings.ToLower(a), nil
+}
+
+func toTitleBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 2 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	return strings.ToTitle(a), nil
+}
+
+func toUpperBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 2 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	return strings.ToUpper(a), nil
+}
+
+func trimBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 3 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	b, berr := EvalAsString(lst.ElementAt(2), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	if berr != nil {
+		return nil, berr
+	}
+	return strings.Trim(a, b), nil
+}
+
+func trimLeftBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 3 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	b, berr := EvalAsString(lst.ElementAt(2), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	if berr != nil {
+		return nil, berr
+	}
+	return strings.TrimLeft(a, b), nil
+}
+
+func trimPrefixBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 3 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	b, berr := EvalAsString(lst.ElementAt(2), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	if berr != nil {
+		return nil, berr
+	}
+	return strings.TrimPrefix(a, b), nil
+}
+
+func trimRightBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 3 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	b, berr := EvalAsString(lst.ElementAt(2), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	if berr != nil {
+		return nil, berr
+	}
+	return strings.TrimRight(a, b), nil
+}
+
+func trimSpaceBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 2 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 1)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	return strings.TrimSpace(a), nil
+}
+
+func trimSuffixBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	if lst.Len() != 3 {
+		return nil, NewEvalError(lst.Position(), ErrorTheNumberOfArgumentsDoesNotMatch, lst.Len()-1, 2)
+	}
+	a, aerr := EvalAsString(lst.ElementAt(1), ns)
+	b, berr := EvalAsString(lst.ElementAt(2), ns)
+	if aerr != nil {
+		return nil, aerr
+	}
+	if berr != nil {
+		return nil, berr
+	}
+	return strings.TrimSuffix(a, b), nil
+}
+
 // RegisterStrings stに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterStrings(ns *Namespace) {
 	ns.RegisterExtension(strCmpSymbol, nil, strCmpBody)
@@ -346,4 +486,14 @@ func RegisterStrings(ns *Namespace) {
 	ns.RegisterExtension(lastIndexAnySymbol, nil, lastIndexAnyBody)
 	ns.RegisterExtension(repeatSymbol, nil, repeatBody)
 	ns.RegisterExtension(replaceSymbol, nil, replaceBody)
+	ns.RegisterExtension(titleSymbol, nil, titleBody)
+	ns.RegisterExtension(toLowerSymbol, nil, toLowerBody)
+	ns.RegisterExtension(toTitleSymbol, nil, toTitleBody)
+	ns.RegisterExtension(toUpperSymbol, nil, toUpperBody)
+	ns.RegisterExtension(trimSymbol, nil, trimBody)
+	ns.RegisterExtension(trimLeftSymbol, nil, trimLeftBody)
+	ns.RegisterExtension(trimPrefixSymbol, nil, trimPrefixBody)
+	ns.RegisterExtension(trimRightSymbol, nil, trimRightBody)
+	ns.RegisterExtension(trimSpaceSymbol, nil, trimSpaceBody)
+	ns.RegisterExtension(trimSuffixSymbol, nil, trimSuffixBody)
 }
