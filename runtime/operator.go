@@ -30,6 +30,9 @@ const (
 	strSymbol        = "str"
 	intSymbol        = "int"
 	floatSymbol      = "float"
+	isStrSymbol      = "is-str"
+	isIntSymbol      = "is-int"
+	isFloatSymbol    = "is-float"
 )
 
 // 演算子に関するエラーコード
@@ -688,6 +691,63 @@ func floatBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, err
 	}
 }
 
+func isStrBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		p, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = p
+	}
+
+	for i := 1; i < lst.Len(); i++ {
+		_, ok := params[i].(string)
+		if !ok {
+			return BoolToInt(false), nil
+		}
+	}
+	return BoolToInt(true), nil
+}
+
+func isIntBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		p, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = p
+	}
+
+	for i := 1; i < lst.Len(); i++ {
+		_, ok := params[i].(int64)
+		if !ok {
+			return BoolToInt(false), nil
+		}
+	}
+	return BoolToInt(true), nil
+}
+
+func isFloatBody(_ interface{}, lst *parser.List, ns *Namespace) (interface{}, error) {
+	params := make([]interface{}, lst.Len())
+	for i := 1; i < lst.Len(); i++ {
+		p, err := EvalElement(lst.ElementAt(i), ns)
+		if err != nil {
+			return nil, err
+		}
+		params[i] = p
+	}
+
+	for i := 1; i < lst.Len(); i++ {
+		_, ok := params[i].(float64)
+		if !ok {
+			return BoolToInt(false), nil
+		}
+	}
+	return BoolToInt(true), nil
+}
+
 // RegisterOperators stに演算子のシンボルを、nsに演算子に対応する拡張関数をそれぞれ登録する。
 func RegisterOperators(ns *Namespace) {
 	ns.RegisterExtension(addSymbol, nil, addBody)
@@ -711,4 +771,7 @@ func RegisterOperators(ns *Namespace) {
 	ns.RegisterExtension(strSymbol, nil, strBody)
 	ns.RegisterExtension(intSymbol, nil, intBody)
 	ns.RegisterExtension(floatSymbol, nil, floatBody)
+	ns.RegisterExtension(isStrSymbol, nil, isStrBody)
+	ns.RegisterExtension(isIntSymbol, nil, isIntBody)
+	ns.RegisterExtension(isFloatSymbol, nil, isFloatBody)
 }
